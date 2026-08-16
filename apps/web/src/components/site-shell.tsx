@@ -12,7 +12,7 @@ const links = [
   { href: '/design-system', label: 'Design system' },
 ];
 
-export function SiteShell({ children }: { children: ReactNode }) {
+export function SiteShell({ children, signedIn }: { children: ReactNode; signedIn: boolean }) {
   const pathname = usePathname();
   const navItems = links.map((item) => ({
     ...item,
@@ -32,9 +32,15 @@ export function SiteShell({ children }: { children: ReactNode }) {
       navItems={navItems}
       actions={
         <>
-          <Button variant="ghost" className="hidden sm:inline-flex">
-            Sign in
-          </Button>
+          {signedIn ? (
+            <Button asChild variant="ghost" className="hidden sm:inline-flex">
+              <Link href="/account">Account</Link>
+            </Button>
+          ) : (
+            <Button asChild variant="ghost" className="hidden sm:inline-flex">
+              <Link href="/sign-in">Sign in</Link>
+            </Button>
+          )}
           <Button asChild>
             <Link href="/trips">Plan a trip</Link>
           </Button>

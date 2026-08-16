@@ -2,6 +2,7 @@ import { Bricolage_Grotesque, Figtree } from 'next/font/google';
 import type { Metadata, Viewport } from 'next';
 import type { CSSProperties, ReactNode } from 'react';
 import { SiteShell } from '../components/site-shell';
+import { auth } from '../server/identity/auth';
 import './globals.css';
 
 const display = Bricolage_Grotesque({
@@ -30,7 +31,8 @@ export const viewport: Viewport = {
   themeColor: '#0b2e26',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const session = await auth();
   const fontVars = {
     '--travel-font-display': 'var(--font-display), sans-serif',
     '--travel-font-body': 'var(--font-body), sans-serif',
@@ -39,7 +41,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en-NZ" className={`${display.variable} ${body.variable}`}>
       <body style={fontVars}>
-        <SiteShell>{children}</SiteShell>
+        <SiteShell signedIn={Boolean(session?.user)}>{children}</SiteShell>
       </body>
     </html>
   );

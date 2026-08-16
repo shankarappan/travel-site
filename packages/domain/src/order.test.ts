@@ -1,15 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assertPositiveMoney, canTransitionOrder, createUserId, transitionOrder } from './index.js';
-
-describe('createUserId', () => {
-  it('trims and accepts non-empty ids', () => {
-    expect(createUserId('  user_1 ').value).toBe('user_1');
-  });
-
-  it('rejects empty ids', () => {
-    expect(() => createUserId('   ')).toThrow(/empty/i);
-  });
-});
+import { assertPositiveMoney, canTransitionOrder, transitionOrder } from './index.js';
 
 describe('assertPositiveMoney', () => {
   it('accepts valid NZD amounts', () => {

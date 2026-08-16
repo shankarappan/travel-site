@@ -39,3 +39,4 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           NEXT_PUBLIC_ADMIN_URL: http://localhost:3001
           LOG_LEVEL: info
+          AUTH_SECRET: ci-only-auth-secret-not-for-production

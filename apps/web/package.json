@@ -8,7 +8,7 @@
     "start": "next start --port 3000",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests --config ./vitest.config.ts"
   },
   "dependencies": {
     "@travel/ai": "workspace:*",
@@ -18,8 +18,10 @@
     "@travel/providers": "workspace:*",
     "@travel/ui": "workspace:*",
     "next": "^15.3.3",
+    "next-auth": "5.0.0-beta.25",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
