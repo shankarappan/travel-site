@@ -1,7 +1,8 @@
 # Implementation plan
 
-Status: **Prompts 01–25 scaffolded on branch** (sandbox/in-memory limits still apply).
-Sources of truth: Technical Blueprint v1.0, `docs/product/cursor-master-prompt.md`, Feature Prompt Library, this checklist.
+Status: **Durable platform foundation complete** (Postgres repositories for identity/consent/trips/commerce/conversations). Feature Prompts 01–25 remain sandbox regarding live inventory/PSP.
+
+See `docs/durable-platform-foundation.md` and ADR 0003.
 
 Working agreement:
 1. Re-read Master Prompt + relevant Blueprint sections before each Feature Prompt.
@@ -47,15 +48,19 @@ Working agreement:
 
 ## Accepted gaps before production
 
-- Identity, consent, trips, commerce, conversations remain **in-memory**.
 - Admin RBAC/MFA not enforced on mutations.
 - Magic links logged in non-production; OAuth needs real `AUTH_*` secrets.
 - Payments/bookings are **sandbox only** — do not claim live inventory/GDS.
 - Missing uploaded `04_CODEX_DEVELOPMENT_PLAYBOOK.md` (noted).
 
-## Next hardening (post Feature Prompt library)
+## Completed hardening
 
-1. Postgres + migrations for identity/consent/trips/commerce.
-2. Enforce admin auth + role checks.
-3. Real PSP webhook secrets + reconciliation job worker.
-4. Expand AI adversarial evals and metrics export.
+1. Postgres + migrations for identity/consent/trips/commerce/conversations (`@travel/db`).
+2. Idempotent webhook/booking keys with uniqueness constraints.
+3. Health endpoints + correlation IDs + log redaction hooks.
+
+## Next hardening (post durable foundation)
+
+1. Enforce admin auth + role checks.
+2. Real PSP webhook secrets + reconciliation job worker.
+3. Expand AI adversarial evals and metrics export.

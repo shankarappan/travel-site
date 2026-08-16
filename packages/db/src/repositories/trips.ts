@@ -44,7 +44,9 @@ export class PostgresTripRepository implements TripRepository {
   constructor(private readonly pool: DbPool) {}
 
   private async loadTrip(tripId: string): Promise<Trip | null> {
-    const tripResult = await this.pool.query<TripRow>(`SELECT * FROM trips WHERE id = $1`, [tripId]);
+    const tripResult = await this.pool.query<TripRow>(`SELECT * FROM trips WHERE id = $1`, [
+      tripId,
+    ]);
     const trip = tripResult.rows[0];
     if (!trip) return null;
 

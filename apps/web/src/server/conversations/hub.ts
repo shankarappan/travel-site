@@ -28,7 +28,10 @@ export async function issueAccountLinkCode(userId: string): Promise<string> {
   return conversationRepository().issueAccountLinkCode(userId);
 }
 
-export async function verifyAccountLink(threadId: string, code: string): Promise<ConversationRecord> {
+export async function verifyAccountLink(
+  threadId: string,
+  code: string,
+): Promise<ConversationRecord> {
   return conversationRepository().verifyAccountLink(threadId, code);
 }
 

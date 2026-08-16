@@ -1,11 +1,10 @@
-import { createLogger } from '@travel/observability';
+import { createLogger, createRequestId } from '@travel/observability';
 import { NextResponse, type NextRequest } from 'next/server';
 
 const logger = createLogger({ service: 'web-middleware' });
 
 export function middleware(request: NextRequest) {
-  const incoming = request.headers.get('x-correlation-id');
-  const correlationId = incoming && incoming.length > 8 ? incoming : crypto.randomUUID();
+  const correlationId = createRequestId(request.headers.get('x-correlation-id'));
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-correlation-id', correlationId);
 

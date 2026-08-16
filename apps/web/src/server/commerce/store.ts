@@ -1,4 +1,10 @@
-import { advanceOrder, createOrder, type Order, type PaymentRecord, type PaymentStatus } from '@travel/domain';
+import {
+  advanceOrder,
+  createOrder,
+  type Order,
+  type PaymentRecord,
+  type PaymentStatus,
+} from '@travel/domain';
 import { createLogger } from '@travel/observability';
 import { getDefaultAccommodationProvider } from '@travel/providers';
 import { commerceRepository } from '../persistence/repos';
@@ -108,7 +114,11 @@ export async function handlePaymentWebhook(input: {
   if (!order) throw new Error('Order missing for payment');
 
   if (input.status === 'succeeded') {
-    if (order.status === 'PAID' || order.status === 'SUPPLIER_PENDING' || order.status === 'CONFIRMED') {
+    if (
+      order.status === 'PAID' ||
+      order.status === 'SUPPLIER_PENDING' ||
+      order.status === 'CONFIRMED'
+    ) {
       return { duplicate: false, order };
     }
     const paid = advanceOrder(order, 'PAID');

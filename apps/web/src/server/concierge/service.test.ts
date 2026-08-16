@@ -5,10 +5,7 @@ import type {
   ConversationRepository,
 } from '@travel/db';
 import { beforeEach, describe, expect, it } from 'vitest';
-import {
-  resetRepositorySingletons,
-  setRepositoriesForTests,
-} from '../persistence/repos';
+import { resetRepositorySingletons, setRepositoriesForTests } from '../persistence/repos';
 import { evaluateFixture, handleConciergeTurn, resetConciergeStore } from './service';
 
 class MemoryConversationRepository implements ConversationRepository {

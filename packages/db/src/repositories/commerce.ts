@@ -326,7 +326,9 @@ export class PostgresCommerceRepository implements CommerceRepository {
   }
 
   async listOrders(): Promise<Order[]> {
-    const result = await this.pool.query<{ id: string }>(`SELECT id FROM orders ORDER BY created_at`);
+    const result = await this.pool.query<{ id: string }>(
+      `SELECT id FROM orders ORDER BY created_at`,
+    );
     const orders: Order[] = [];
     for (const row of result.rows) {
       const order = await this.loadOrder(row.id);

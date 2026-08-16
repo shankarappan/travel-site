@@ -150,7 +150,10 @@ export interface ConversationRepository {
     externalId?: string;
   }): Promise<ConversationRecord>;
   get(id: string): Promise<ConversationRecord | null>;
-  findByChannel(channel: ConversationChannel, externalId: string): Promise<ConversationRecord | null>;
+  findByChannel(
+    channel: ConversationChannel,
+    externalId: string,
+  ): Promise<ConversationRecord | null>;
   appendMessage(
     conversationId: string,
     message: Omit<ConversationMessageRecord, 'id' | 'createdAt'> & {

@@ -1,10 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import {
-  handleVoiceTool,
-  handleWhatsAppInbound,
-  verifyWhatsAppSignature,
-} from './adapters';
+import { handleVoiceTool, handleWhatsAppInbound, verifyWhatsAppSignature } from './adapters';
 
 describe('channel adapters', () => {
   it('verifies WhatsApp HMAC signatures', () => {

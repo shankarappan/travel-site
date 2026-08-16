@@ -59,16 +59,14 @@ export class PostgresConversationRepository implements ConversationRepository {
       channelExternalId: channelRow?.external_id ?? null,
       linkedUserId: channelRow?.linked_user_id ?? null,
       verified: channelRow?.verified ?? false,
-      messages: messages.rows.map(
-        (message): ConversationMessageRecord => ({
-          id: message.id,
-          role: message.role,
-          direction: message.direction,
-          body: message.body,
-          toolName: message.tool_name,
-          createdAt: message.created_at.toISOString(),
-        }),
-      ),
+      messages: messages.rows.map((message): ConversationMessageRecord => ({
+        id: message.id,
+        role: message.role,
+        direction: message.direction,
+        body: message.body,
+        toolName: message.tool_name,
+        createdAt: message.created_at.toISOString(),
+      })),
       createdAt: row.created_at.toISOString(),
       updatedAt: row.updated_at.toISOString(),
     };

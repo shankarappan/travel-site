@@ -146,7 +146,11 @@ export class PostgresConsentRepository implements ConsentRepository {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
-      const result = await client.query<{ user_id: string; purpose: ConsentPurpose; used_at: Date | null }>(
+      const result = await client.query<{
+        user_id: string;
+        purpose: ConsentPurpose;
+        used_at: Date | null;
+      }>(
         `SELECT user_id, purpose, used_at FROM consent_unsubscribe_tokens WHERE token = $1 FOR UPDATE`,
         [token],
       );

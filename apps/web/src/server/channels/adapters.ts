@@ -91,7 +91,8 @@ export function handleVoiceTool(input: {
   if (touched && !input.confirmedReadback) {
     return {
       ok: false,
-      message: 'Please confirm the read-back of name/email/date/booking reference before continuing.',
+      message:
+        'Please confirm the read-back of name/email/date/booking reference before continuing.',
     };
   }
   switch (input.tool) {

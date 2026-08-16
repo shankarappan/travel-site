@@ -57,9 +57,7 @@ function toUiConversation(record: PersistedConversation): ConversationRecord {
     messages: record.messages.map((message) => ({
       id: message.id,
       role: (message.role === 'assistant' || message.role === 'tool' ? message.role : 'user') as
-        | 'user'
-        | 'assistant'
-        | 'tool',
+        'user' | 'assistant' | 'tool',
       content: message.body,
       toolName: message.toolName ?? undefined,
       createdAt: message.createdAt,

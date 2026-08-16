@@ -138,10 +138,7 @@ describeDb('postgres repositories (integration)', () => {
       title: 'Second',
     });
     const ids = second.days[0]!.items.map((item) => item.id);
-    const reordered = await trips.reorderItems(mine.id, userA.id.value, dayId, [
-      ids[1]!,
-      ids[0]!,
-    ]);
+    const reordered = await trips.reorderItems(mine.id, userA.id.value, dayId, [ids[1]!, ids[0]!]);
     expect(reordered.days[0]!.items[0]!.title).toBe('Second');
     const deleted = await trips.deleteItem(mine.id, userA.id.value, dayId, ids[1]!);
     expect(deleted.days[0]!.items).toHaveLength(1);
@@ -230,6 +227,21 @@ describeDb('postgres repositories (integration)', () => {
     });
     expect(duplicate.duplicate).toBe(true);
 
+    const concurrent = await Promise.all(
+      Array.from({ length: 5 }, (_, index) =>
+        commerce
+          .recordWebhookEvent({
+            eventId: 'evt_concurrent',
+            source: 'payments',
+            providerRef: payment.providerRef,
+            status: 'succeeded',
+          })
+          .then((result) => ({ index, ...result })),
+      ),
+    );
+    expect(concurrent.filter((item) => !item.duplicate)).toHaveLength(1);
+    expect(concurrent.filter((item) => item.duplicate)).toHaveLength(4);
+
     await commerce.queueEmail({
       template: 'booking.confirmed',
       version: '1.0.0',
@@ -241,5 +253,22 @@ describeDb('postgres repositories (integration)', () => {
     ).toBe(true);
 
     expect(order.userId.value).toBe(createUserId(account.id.value).value);
+  });
+
+  it('restart durability: data survives a new pool against the same database', async () => {
+    const identity = new PostgresIdentityRepository(pool);
+    const account = await upsertAccountFromIdentityRepo(identity, {
+      provider: 'email',
+      providerSubject: 'persist@example.com',
+      email: 'persist@example.com',
+      emailVerified: true,
+    });
+
+    await pool.end();
+    pool = createPool();
+    const identityAfterRestart = new PostgresIdentityRepository(pool);
+    const reloaded = await identityAfterRestart.getById(account.id.value);
+    expect(reloaded?.primaryEmail).toBe('persist@example.com');
+    expect(reloaded?.identities).toHaveLength(1);
   });
 });

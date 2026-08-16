@@ -12,7 +12,10 @@ export function defaultMigrationsDir(): string {
   return path.resolve(here, '../../../infra/migrations');
 }
 
-export async function migrate(pool: DbPool, migrationsDir = defaultMigrationsDir()): Promise<string[]> {
+export async function migrate(
+  pool: DbPool,
+  migrationsDir = defaultMigrationsDir(),
+): Promise<string[]> {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
       id TEXT PRIMARY KEY,
@@ -20,9 +23,7 @@ export async function migrate(pool: DbPool, migrationsDir = defaultMigrationsDir
     )
   `);
 
-  const files = (await readdir(migrationsDir))
-    .filter((name) => name.endsWith('.sql'))
-    .sort();
+  const files = (await readdir(migrationsDir)).filter((name) => name.endsWith('.sql')).sort();
 
   const applied: string[] = [];
   for (const file of files) {

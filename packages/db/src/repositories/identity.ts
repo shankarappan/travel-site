@@ -1,7 +1,9 @@
 import {
   createUserAccount,
   createUserId,
+  linkIdentity,
   normalizeEmail,
+  resolveAccountForSignIn,
   type IdentityProvider,
   type LinkedIdentity,
   type Role,
@@ -30,15 +32,13 @@ function mapAccount(user: UserRow, identities: IdentityRow[]): UserAccount {
     id: createUserId(user.id),
     primaryEmail: user.primary_email,
     roles: user.roles as Role[],
-    identities: identities.map(
-      (identity): LinkedIdentity => ({
-        provider: identity.provider,
-        providerSubject: identity.provider_subject,
-        email: identity.email,
-        emailVerified: identity.email_verified,
-        linkedAt: identity.linked_at.toISOString(),
-      }),
-    ),
+    identities: identities.map((identity): LinkedIdentity => ({
+      provider: identity.provider,
+      providerSubject: identity.provider_subject,
+      email: identity.email,
+      emailVerified: identity.email_verified,
+      linkedAt: identity.linked_at.toISOString(),
+    })),
     createdAt: user.created_at.toISOString(),
   };
 }
@@ -156,9 +156,10 @@ export class PostgresIdentityRepository implements IdentityRepository {
         email: string;
         expires_at: Date;
         consumed_at: Date | null;
-      }>(`SELECT email, expires_at, consumed_at FROM magic_link_tokens WHERE token = $1 FOR UPDATE`, [
-        token,
-      ]);
+      }>(
+        `SELECT email, expires_at, consumed_at FROM magic_link_tokens WHERE token = $1 FOR UPDATE`,
+        [token],
+      );
       const row = result.rows[0];
       if (!row || row.consumed_at || row.expires_at.getTime() < Date.now()) {
         await client.query('ROLLBACK');
@@ -187,35 +188,14 @@ export async function upsertAccountFromIdentityRepo(
     emailVerified: boolean;
   },
 ): Promise<UserAccount> {
-  const {
-    resolveAccountForSignIn,
-    linkIdentity,
-  } = await import('@travel/domain');
-
   const bySubject = await repo.findByProviderSubject(input.provider, input.providerSubject);
-  const byEmail =
-    input.email && input.emailVerified
-      ? await repo.findByVerifiedEmail(input.email)
-      : input.email
-        ? await repo.findByVerifiedEmail(input.email)
-        : [];
+  const byEmail = input.email ? await repo.findByVerifiedEmail(input.email) : [];
 
-  // Build a minimal account list for the pure resolver.
   const accounts: UserAccount[] = [];
   if (bySubject) accounts.push(bySubject);
   for (const account of byEmail) {
     if (!accounts.some((item) => item.id.value === account.id.value)) {
       accounts.push(account);
-    }
-  }
-
-  // Also catch unverified email conflicts: primary email match
-  if (input.email && !input.emailVerified) {
-    const primaryMatches = await repo.findByVerifiedEmail(input.email);
-    for (const account of primaryMatches) {
-      if (!accounts.some((item) => item.id.value === account.id.value)) {
-        accounts.push(account);
-      }
     }
   }
 

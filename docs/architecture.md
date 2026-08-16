@@ -19,12 +19,13 @@ apps/
 packages/
   domain/              # Entities, value objects, policies
   api-contracts/       # Zod schemas and shared API types
+  db/                  # Postgres pool, migrations runner, repositories
   providers/           # Accommodation, payment, messaging adapters
   ai/                  # Prompts, tool schemas, evals, guardrails
   observability/       # Logging, env validation, tracing helpers
   ui/                  # Design tokens and shared UI primitives
 infra/
-  migrations/
+  migrations/          # Versioned SQL migrations
   deployment/
 docs/
   adr/
@@ -38,10 +39,15 @@ docs/
 | --- | --- |
 | Web | Next.js + React + TypeScript |
 | UI | Tailwind + accessible headless patterns + design tokens |
-| Data | PostgreSQL (managed) |
-| Auth | Managed auth with internal identity mapping |
-| Payments | Hosted/tokenized PSP UI |
-| Observability | Structured logs + OpenTelemetry-compatible hooks |
+| Data | PostgreSQL via `@travel/db` repositories |
+| Auth | Auth.js with durable identity mapping |
+| Payments | Hosted/tokenized PSP UI (sandbox webhook path) |
+| Observability | Structured logs + correlation IDs + metrics/error hooks |
+
+## Persistence boundary
+
+Application/domain code depends on repository interfaces in `@travel/db`, not on SQL.
+See [ADR 0003](./adr/0003-postgres-durable-persistence.md) and [durable platform notes](./durable-platform-foundation.md).
 
 ## Working agreements
 

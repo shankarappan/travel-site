@@ -7,9 +7,7 @@ export const databaseEnvSchema = z.object({
 
 export type DatabaseEnv = z.infer<typeof databaseEnvSchema>;
 
-export function loadDatabaseEnv(
-  source: NodeJS.ProcessEnv = process.env,
-): DatabaseEnv {
+export function loadDatabaseEnv(source: NodeJS.ProcessEnv = process.env): DatabaseEnv {
   return databaseEnvSchema.parse(source);
 }
 
