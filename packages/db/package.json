@@ -17,7 +17,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run",
-    "migrate": "tsx src/migrate-cli.ts"
+    "migrate": "pnpm --filter @travel/observability --filter @travel/domain run build && tsx src/migrate-cli.ts"
   },
   "dependencies": {
     "@travel/domain": "workspace:*",
