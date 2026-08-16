@@ -88,14 +88,10 @@ These are not separate Feature Prompts but are required by the Blueprint and sho
 
 ## Proposed next execution slice (when approved)
 
-**Stop condition for the next coding turn:** complete Prompt 05 only (destination content MVP), review/test, update checklist + PR — then pause for Prompt 06 unless told to continue the chain.
+**Stop condition for the next coding turn:** complete Prompt 06 only (saved trips) after Prompt 05 is reviewed — unless told to continue the chain.
 
-Prompt 05 smallest change set:
-- Content types: Destination, Guide/Article (fields: slug, title, hero, highlights, body, SEO, image alt/source, map placeholder).
-- File/JSON or MDX CMS for MVP (swap-ready interface; no hard-coded one-off pages).
-- Routes: `/destinations`, `/destinations/[slug]`, optional `/guides/[slug]`.
-- Reuse `@travel/ui` shell; WCAG-minded images; SSR metadata.
-- Tests for content parsing/slug validation; build must pass.
+### Prompt 05 — Destination content MVP — **complete**
+CMS JSON catalog via `CatalogRepository`, reusable templates, `/destinations`, `/destinations/[slug]`, `/guides/[slug]`, SEO metadata, image alt/source, map hooks, NZ fixtures.
 
 ---
 

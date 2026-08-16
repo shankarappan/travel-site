@@ -1,0 +1,36 @@
+{
+  "slug": "rotorua",
+  "name": "Rotorua",
+  "region": "Bay of Plenty",
+  "summary": "Geothermal landscapes and Māori cultural experiences around Lake Rotorua.",
+  "hero": {
+    "src": "https://images.unsplash.com/photo-1589802829985-817e51171b92?auto=format&fit=crop&w=2000&q=80",
+    "alt": "Steam rising from geothermal ground with trees in New Zealand",
+    "source": "Unsplash",
+    "sourceUrl": "https://unsplash.com"
+  },
+  "highlights": [
+    "Geothermal parks and mud pools",
+    "Lake Rotorua shoreline",
+    "Cultural performance venues",
+    "Redwood forest walks nearby"
+  ],
+  "body": [
+    "Rotorua pairs geothermal terrain with deep cultural heritage. Editorial pages cover orientation only; bookings and live tours stay behind verified provider tools.",
+    "Start with lakeside orientation, then choose geothermal parks with clear accessibility notes before committing to timed experiences."
+  ],
+  "accommodationPlaceholder": "Rotorua stay search will use the normalized accommodation provider interface.",
+  "activitiesPlaceholder": "Activity inventory is not live yet — no fabricated tour times or prices.",
+  "map": {
+    "label": "Rotorua lakefront",
+    "latitude": -38.1368,
+    "longitude": 176.2497,
+    "zoom": 11
+  },
+  "seo": {
+    "title": "Rotorua travel guide",
+    "description": "Discover Rotorua geothermal parks, lake walks and cultural experiences with map hooks and SEO-ready templates."
+  },
+  "relatedGuideSlugs": ["rotorua-geothermal-day"],
+  "updatedAt": "2026-08-16T00:00:00.000Z"
+}

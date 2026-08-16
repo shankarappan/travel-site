@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 
 const links = [
   { href: '/', label: 'Discover' },
+  { href: '/destinations', label: 'Destinations' },
   { href: '/search', label: 'Stays' },
   { href: '/trips', label: 'Trips' },
   { href: '/design-system', label: 'Design system' },

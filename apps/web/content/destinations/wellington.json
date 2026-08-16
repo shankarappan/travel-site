@@ -1,0 +1,36 @@
+{
+  "slug": "wellington",
+  "name": "Wellington",
+  "region": "Wellington",
+  "summary": "Harbour city with museums, craft food and coastal walks on the North Island.",
+  "hero": {
+    "src": "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=2000&q=80",
+    "alt": "Wellington harbour waterfront buildings under a clear sky",
+    "source": "Unsplash",
+    "sourceUrl": "https://unsplash.com"
+  },
+  "highlights": [
+    "Te Papa and civic museum mile",
+    "Waterfront promenade",
+    "Zealandia wildlife sanctuary",
+    "Compact cafe districts"
+  ],
+  "body": [
+    "Wellington rewards slow harbour days and museum mornings. Wind is part of the character — pack layers and keep outdoor plans flexible.",
+    "This destination template is CMS-driven so editors can update highlights and SEO without shipping a new page component."
+  ],
+  "accommodationPlaceholder": "Central Wellington stays will appear via sandbox provider search.",
+  "activitiesPlaceholder": "Museum and sanctuary tips stay editorial until activity adapters exist.",
+  "map": {
+    "label": "Wellington waterfront",
+    "latitude": -41.2865,
+    "longitude": 174.7762,
+    "zoom": 12
+  },
+  "seo": {
+    "title": "Wellington travel guide",
+    "description": "Explore Wellington harbour walks, museums and food neighbourhoods with reusable destination templates."
+  },
+  "relatedGuideSlugs": [],
+  "updatedAt": "2026-08-16T00:00:00.000Z"
+}

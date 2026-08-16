@@ -35,7 +35,7 @@ export default function HomePage() {
                 asChild
                 className="bg-white text-[var(--travel-color-ink)] hover:bg-[var(--travel-color-mist)]"
               >
-                <Link href="/search">Explore stays</Link>
+                <Link href="/destinations">Explore destinations</Link>
               </Button>
               <Button
                 asChild
@@ -56,6 +56,14 @@ export default function HomePage() {
         <p className="mt-3 max-w-2xl text-[var(--travel-color-ink-soft)]">
           Conventional search and conversational help share one trusted backend. Live availability
           and bookings arrive only through verified provider tools.
+        </p>
+        <p className="mt-4">
+          <Link
+            href="/destinations"
+            className="font-semibold text-[var(--travel-color-fern)] underline-offset-2 hover:underline"
+          >
+            Browse New Zealand destinations
+          </Link>
         </p>
       </section>
     </>
