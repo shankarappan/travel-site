@@ -29,6 +29,11 @@ export {
   PostgresIdentityRepository,
   upsertAccountFromIdentityRepo,
 } from './repositories/identity.js';
+export { generateMagicLinkToken, hashMagicLinkToken } from './repositories/magic-link-token.js';
+export type {
+  CountMagicLinkRequestsInput,
+  IssueMagicLinkTokenInput,
+} from './repositories/types.js';
 export { PostgresConsentRepository } from './repositories/consent.js';
 export { PostgresTripRepository } from './repositories/trips.js';
 export { PostgresCommerceRepository } from './repositories/commerce.js';

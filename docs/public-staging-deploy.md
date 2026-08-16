@@ -30,10 +30,27 @@ The agent VM is remote. Your browser’s `localhost` is your machine. A Vercel d
 | --- | --- |
 | `DATABASE_URL` | `postgresql://…` from Neon/Vercel Postgres |
 | `AUTH_SECRET` | long random string |
-| `NEXT_PUBLIC_APP_URL` | your Vercel URL, e.g. `https://travel-site-….vercel.app` |
+| `NEXT_PUBLIC_APP_URL` | your Vercel URL, e.g. `https://travel-site-chi-five.vercel.app` |
+| `AUTH_URL` | same as `NEXT_PUBLIC_APP_URL` (Auth.js canonical origin) |
 | `NEXT_PUBLIC_ADMIN_URL` | same as app URL for now (admin is separate) |
 | `LOG_LEVEL` | `info` |
 | `NODE_ENV` | `production` |
+| `RESEND_API_KEY` | Resend API key (`re_…`) — **required** for magic-link email |
+| `EMAIL_FROM` | `Aotearoa Trails <noreply@your-verified-domain.com>` |
+| `AUTH_GOOGLE_ID` | Google OAuth client ID — required for Google SSO |
+| `AUTH_GOOGLE_SECRET` | Google OAuth client secret |
+
+### Google OAuth console (required for SSO)
+
+Authorized JavaScript origin:
+
+- `https://travel-site-chi-five.vercel.app`
+
+Authorized redirect URI:
+
+- `https://travel-site-chi-five.vercel.app/api/auth/callback/google`
+
+(Apple optional: `…/api/auth/callback/apple` with `AUTH_APPLE_ID` + `AUTH_APPLE_SECRET`.)
 
 5. Deploy
 6. After first deploy succeeds, run migrations against that DB:
@@ -57,7 +74,7 @@ pnpm db:migrate
 
 - `/` landing
 - `/api/health` and `/api/health/db`
-- `/destinations`, `/sign-in` (magic link appears in Vercel function logs in sandbox/dev-style setups — for production email you still need a mail provider)
+- `/destinations`, `/sign-in` (magic link arrives by email when `RESEND_API_KEY` + `EMAIL_FROM` are set; Google appears only when `AUTH_GOOGLE_*` are set)
 - `/search` → checkout sandbox flow (sign-in required)
 
 ## Notes

@@ -14,6 +14,18 @@ import type {
   UserAccount,
 } from '@travel/domain';
 
+export type IssueMagicLinkTokenInput = {
+  email: string;
+  ttlMs?: number;
+  requestIp?: string | null;
+};
+
+export type CountMagicLinkRequestsInput = {
+  email?: string;
+  requestIp?: string | null;
+  windowMs: number;
+};
+
 export interface IdentityRepository {
   getById(id: string): Promise<UserAccount | null>;
   findByProviderSubject(
@@ -22,8 +34,13 @@ export interface IdentityRepository {
   ): Promise<UserAccount | null>;
   findByVerifiedEmail(email: string): Promise<UserAccount[]>;
   save(account: UserAccount): Promise<UserAccount>;
-  issueMagicLinkToken(email: string, ttlMs?: number): Promise<string>;
+  /** Issues a raw token for emailing; persists only a hash. */
+  issueMagicLinkToken(
+    emailOrInput: string | IssueMagicLinkTokenInput,
+    ttlMs?: number,
+  ): Promise<string>;
   consumeMagicLinkToken(token: string): Promise<string | null>;
+  countRecentMagicLinkRequests(input: CountMagicLinkRequestsInput): Promise<number>;
 }
 
 export interface ConsentRepository {
