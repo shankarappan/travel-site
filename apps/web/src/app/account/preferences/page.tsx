@@ -29,17 +29,19 @@ export default async function PreferencesPage() {
 
   return (
     <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="font-[family-name:var(--travel-font-display)] text-3xl font-semibold text-[var(--travel-color-ink)]">
-        Communication preferences
-      </h1>
+      <p className="travel-caption">Traveller care</p>
+      <h1 className="travel-h1 mt-2 text-[var(--travel-color-ink)]">Communication preferences</h1>
       <p className="mt-2 mb-8 max-w-2xl text-[var(--travel-color-ink-soft)]">
-        Choose marketing channels separately from transactional booking messages. Withdrawal is
-        recorded in an append-only consent ledger.
+        Choose what you’d like to hear from us. Booking and account messages stay available so we
+        can support your trips.
       </p>
       <ConsentPreferencesForm initial={initial} />
       <p className="mt-8 text-sm text-[var(--travel-color-ink-soft)]">
-        One-click marketing email unsubscribe (dev token):{' '}
-        <a className="underline" href={`/unsubscribe?token=${marketingToken}`}>
+        Prefer a direct exit from marketing email?{' '}
+        <a
+          className="font-medium text-[var(--travel-color-ocean)] underline-offset-2 hover:underline"
+          href={`/unsubscribe?token=${marketingToken}`}
+        >
           Unsubscribe from marketing email
         </a>
       </p>

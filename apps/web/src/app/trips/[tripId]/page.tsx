@@ -35,14 +35,13 @@ export default async function TripDetailPage({ params }: PageProps) {
         <p className="mb-4 text-sm">
           <a
             href="/trips"
-            className="font-semibold text-[var(--travel-color-fern)] underline-offset-2 hover:underline"
+            className="font-semibold text-[var(--travel-color-ocean)] underline-offset-2 hover:underline"
           >
-            All trips
+            ← All trips
           </a>
         </p>
-        <h1 className="font-[family-name:var(--travel-font-display)] text-3xl font-semibold text-[var(--travel-color-ink)]">
-          {trip.title}
-        </h1>
+        <p className="travel-caption">Trip planner</p>
+        <h1 className="travel-h1 mt-2 text-[var(--travel-color-ink)]">{trip.title}</h1>
         <div className="mt-8">
           <TripEditor
             initialTrip={{

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: 'Aotearoa Trails',
     template: '%s · Aotearoa Trails',
   },
-  description: 'Discover New Zealand with an intelligent travel platform.',
+  description: 'New Zealand, planned around you — stays, journeys and a personal travel concierge.',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#0b2e26',
+  themeColor: '#1c4a5a',
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {

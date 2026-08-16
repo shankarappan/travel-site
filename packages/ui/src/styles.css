@@ -3,10 +3,12 @@
 .travel-ui {
   color: var(--travel-color-ink);
   font-family: var(--travel-font-body);
+  font-size: var(--travel-text-body);
+  line-height: 1.55;
   background:
-    radial-gradient(120% 80% at 10% -10%, rgb(79 154 171 / 18%), transparent 55%),
-    radial-gradient(90% 70% at 100% 0%, rgb(31 107 79 / 12%), transparent 50%),
-    linear-gradient(180deg, var(--travel-color-mist), var(--travel-color-surface));
+    radial-gradient(100% 70% at 0% 0%, rgb(28 74 90 / 10%), transparent 50%),
+    radial-gradient(80% 50% at 100% 0%, rgb(107 154 171 / 12%), transparent 45%),
+    linear-gradient(180deg, #f3f2ee 0%, var(--travel-color-surface) 28%, #f8f7f4 100%);
   min-height: 100vh;
 }
 
@@ -27,10 +29,57 @@
   outline-offset: 2px;
 }
 
+.travel-display {
+  font-family: var(--travel-font-display);
+  font-size: var(--travel-text-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.travel-h1 {
+  font-family: var(--travel-font-display);
+  font-size: var(--travel-text-h1);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.travel-h2 {
+  font-family: var(--travel-font-display);
+  font-size: var(--travel-text-h2);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.travel-h3 {
+  font-family: var(--travel-font-display);
+  font-size: var(--travel-text-h3);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.travel-caption {
+  font-size: var(--travel-text-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--travel-color-ink-muted);
+}
+
+.travel-price {
+  font-family: var(--travel-font-display);
+  font-size: var(--travel-text-price);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
 @keyframes travel-fade-up {
   from {
     opacity: 0;
-    transform: translateY(0.75rem);
+    transform: translateY(0.85rem);
   }
   to {
     opacity: 1;
@@ -50,11 +99,21 @@
 @keyframes travel-reveal {
   from {
     opacity: 0;
-    transform: scale(1.03);
+    transform: scale(1.04);
   }
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes travel-soft-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
@@ -63,12 +122,27 @@
 }
 
 .travel-animate-reveal {
-  animation: travel-reveal calc(var(--travel-motion-slow) + 120ms) var(--travel-ease) both;
+  animation: travel-reveal calc(var(--travel-motion-slow) + 140ms) var(--travel-ease) both;
+}
+
+.travel-animate-delay-1 {
+  animation-delay: 90ms;
+}
+.travel-animate-delay-2 {
+  animation-delay: 180ms;
+}
+.travel-animate-delay-3 {
+  animation-delay: 270ms;
+}
+
+.travel-thinking {
+  animation: travel-soft-pulse 1.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .travel-animate-fade-up,
-  .travel-animate-reveal {
+  .travel-animate-reveal,
+  .travel-thinking {
     animation: none;
   }
 }

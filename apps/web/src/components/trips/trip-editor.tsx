@@ -27,6 +27,13 @@ export type TripView = {
   updatedAt: string;
 };
 
+function kindLabel(kind: string): string {
+  if (kind === 'note') return 'Note';
+  if (kind === 'stay') return 'Stay';
+  if (kind === 'activity') return 'Activity';
+  return kind;
+}
+
 export function TripEditor({ initialTrip }: { initialTrip: TripView }) {
   const router = useRouter();
   const [trip, setTrip] = useState(initialTrip);
@@ -163,8 +170,11 @@ export function TripEditor({ initialTrip }: { initialTrip: TripView }) {
   }
 
   return (
-    <div className="space-y-8">
-      <form onSubmit={rename} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+    <div className="space-y-10">
+      <form
+        onSubmit={rename}
+        className="flex flex-col gap-3 rounded-[var(--travel-radius-xl)] bg-[var(--travel-color-surface-elevated)] p-5 shadow-[var(--travel-elevation-1)] sm:flex-row sm:items-end"
+      >
         <Field id="trip-title" label="Trip name" className="flex-1">
           <Input
             id="trip-title"
@@ -174,7 +184,7 @@ export function TripEditor({ initialTrip }: { initialTrip: TripView }) {
           />
         </Field>
         <Button type="submit" variant="secondary" disabled={pending}>
-          Rename
+          Save name
         </Button>
         <Button type="button" variant="danger" disabled={pending} onClick={removeTrip}>
           Delete trip
@@ -182,66 +192,89 @@ export function TripEditor({ initialTrip }: { initialTrip: TripView }) {
       </form>
 
       <section>
-        <h2 className="font-[family-name:var(--travel-font-display)] text-xl font-semibold">
-          {day?.label ?? 'Day 1'}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--travel-color-ink-soft)]">
-          Share/export comes later. Reorder uses confirmed server updates (no optimistic UI).
-        </p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="travel-caption">Itinerary</p>
+            <h2 className="travel-h2 mt-1 text-[var(--travel-color-ink)]">
+              {day?.label ?? 'Day 1'}
+            </h2>
+            <p className="mt-1 text-sm text-[var(--travel-color-ink-soft)]">
+              Shape the day as ideas land — reorder anytime.
+            </p>
+          </div>
+          <p className="text-xs text-[var(--travel-color-ink-muted)]">
+            Updated {new Date(trip.updatedAt).toLocaleString('en-NZ')}
+          </p>
+        </div>
 
         {!day || day.items.length === 0 ? (
           <EmptyState
-            className="mt-4"
-            title="No itinerary items yet"
-            description="Add notes, destinations or activities for this day."
+            className="mt-6"
+            title="Your day is open"
+            description="Add notes, places or activities — they’ll appear as a calm timeline."
           />
         ) : (
-          <ol className="mt-4 space-y-3">
+          <ol className="relative mt-8 space-y-0 border-l border-[var(--travel-color-ocean-soft)] pl-6">
             {day.items.map((item, index) => (
-              <li
-                key={item.id}
-                className="flex flex-col gap-2 border border-[var(--travel-color-border)] bg-[var(--travel-color-surface-elevated)] p-3 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div>
-                  <p className="font-semibold text-[var(--travel-color-ink)]">{item.title}</p>
-                  <p className="text-xs uppercase tracking-[0.12em] text-[var(--travel-color-ink-soft)]">
-                    {item.kind}
-                    {item.refSlug ? ` · ${item.refSlug}` : ''}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    disabled={pending || index === 0}
-                    onClick={() => moveItem(item.id, -1)}
-                  >
-                    Up
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    disabled={pending || index === day.items.length - 1}
-                    onClick={() => moveItem(item.id, 1)}
-                  >
-                    Down
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    disabled={pending}
-                    onClick={() => removeItem(item.id)}
-                  >
-                    Delete
-                  </Button>
+              <li key={item.id} className="relative pb-8 last:pb-0">
+                <span
+                  aria-hidden
+                  className="absolute -left-[1.625rem] top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--travel-color-ocean)] text-[0.65rem] font-semibold text-white"
+                >
+                  {index + 1}
+                </span>
+                <div className="rounded-[var(--travel-radius-lg)] bg-[var(--travel-color-surface-elevated)] p-4 shadow-[var(--travel-elevation-1)] sm:flex sm:items-start sm:justify-between sm:gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--travel-color-ocean)]">
+                      {kindLabel(item.kind)}
+                      {item.refSlug ? ` · ${item.refSlug}` : ''}
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[var(--travel-color-ink)]">
+                      {item.title}
+                    </p>
+                    {item.notes ? (
+                      <p className="mt-2 text-sm text-[var(--travel-color-ink-soft)]">
+                        {item.notes}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2 sm:mt-0">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={pending || index === 0}
+                      onClick={() => moveItem(item.id, -1)}
+                    >
+                      Earlier
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={pending || index === day.items.length - 1}
+                      onClick={() => moveItem(item.id, 1)}
+                    >
+                      Later
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={pending}
+                      onClick={() => removeItem(item.id)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               </li>
             ))}
           </ol>
         )}
 
-        <form onSubmit={addItem} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-          <Field id="item-title" label="Add item" className="flex-1">
+        <form
+          onSubmit={addItem}
+          className="mt-8 flex flex-col gap-3 rounded-[var(--travel-radius-xl)] border border-dashed border-[var(--travel-color-border-strong)] bg-[rgb(255_255_255_/0.55)] p-5 sm:flex-row sm:items-end"
+        >
+          <Field id="item-title" label="Add to this day" className="flex-1">
             <Input
               id="item-title"
               value={itemTitle}
