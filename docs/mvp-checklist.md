@@ -15,12 +15,14 @@ Derived from the Technical Blueprint Definition of Done and Feature Prompt Libra
 - [x] Email/passwordless + Google + Apple auth with one internal user ID
 - [x] Session handling, logout, account linking, role model
 - [x] Consent ledger (transactional vs marketing) + withdrawal UX
+- [x] Durable PostgreSQL persistence for identity + consent (append-only history)
 
 ## Discovery & trips
 
 - [x] CMS-backed NZ destination content with SEO metadata
 - [x] Saved trips / itinerary builder with server-side ownership
 - [x] AI concierge read-only tools + conversation persistence + evals
+- [x] Durable PostgreSQL persistence for trips + channel-agnostic conversations
 
 ## Commerce (sandbox only until proven)
 
@@ -31,6 +33,7 @@ Derived from the Technical Blueprint Definition of Done and Feature Prompt Libra
 - [x] Booking confirmation + reconciliation alerts
 - [x] Transactional email templates (versioned intents)
 - [x] Newsletter / voucher marketing gated by consent
+- [x] Durable PostgreSQL persistence for orders/payments/webhooks/bookings
 
 ## Channels & ops
 
@@ -38,7 +41,7 @@ Derived from the Technical Blueprint Definition of Done and Feature Prompt Libra
 - [x] WhatsApp / Telegram adapters + signature/opt-out/linking hooks
 - [x] Voice tool gateway with confirmation for sensitive fields
 - [x] Admin operations console scaffold (RBAC policy documented; enforcement still open)
-- [x] Observability correlation IDs + runbooks
+- [x] Observability correlation IDs + runbooks + health endpoints
 - [x] PWA hardening (manifest/SW; commercial APIs network-only)
 
 ## Deferred / stubs (explicit Phase 1 non-goals)
