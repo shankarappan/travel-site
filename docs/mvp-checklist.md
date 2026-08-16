@@ -19,7 +19,7 @@ Derived from the Technical Blueprint Definition of Done and Feature Prompt Libra
 ## Discovery & trips
 
 - [x] CMS-backed NZ destination content with SEO metadata
-- [ ] Saved trips / itinerary builder with server-side ownership
+- [x] Saved trips / itinerary builder with server-side ownership
 - [ ] AI concierge read-only tools + conversation persistence + evals
 
 ## Commerce (sandbox only until proven)

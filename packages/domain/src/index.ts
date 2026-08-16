@@ -31,3 +31,15 @@ export {
   isMarketingPurpose,
   materializeConsentStatuses,
 } from './consent.js';
+
+export type { ItineraryItem, ItineraryItemKind, Trip, TripDay } from './trip.js';
+export {
+  TripNotFoundError,
+  TripOwnershipError,
+  addItineraryItem,
+  assertTripOwner,
+  createTrip,
+  deleteItineraryItem,
+  renameTrip,
+  reorderItineraryItems,
+} from './trip.js';

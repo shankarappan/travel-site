@@ -88,10 +88,13 @@ These are not separate Feature Prompts but are required by the Blueprint and sho
 
 ## Proposed next execution slice (when approved)
 
-**Stop condition for the next coding turn:** complete Prompt 06 only (saved trips) after Prompt 05 is reviewed — unless told to continue the chain.
+**Stop condition for the next coding turn:** complete Prompt 07 only (AI concierge read-only) after Prompt 06 is reviewed — unless told to continue the chain.
 
 ### Prompt 05 — Destination content MVP — **complete**
 CMS JSON catalog via `CatalogRepository`, reusable templates, `/destinations`, `/destinations/[slug]`, `/guides/[slug]`, SEO metadata, image alt/source, map hooks, NZ fixtures.
+
+### Prompt 06 — Saved trips / itinerary — **complete**
+Trip/day/item domain, ownership-enforced store + APIs, create/rename/reorder/delete UI (no optimistic mutations).
 
 ---
 

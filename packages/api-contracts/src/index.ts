@@ -91,3 +91,37 @@ export function parseGuideContent(input: unknown): GuideContent {
 export function parseDestinationSlug(input: unknown): string {
   return destinationSlugSchema.parse(input);
 }
+
+export const itineraryItemKindSchema = z.enum([
+  'note',
+  'stay',
+  'activity',
+  'transport',
+  'destination',
+]);
+
+export const createTripInputSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+});
+
+export const renameTripInputSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+});
+
+export const addItineraryItemInputSchema = z.object({
+  dayId: z.string().min(1),
+  kind: itineraryItemKindSchema.default('note'),
+  title: z.string().trim().min(1).max(160),
+  notes: z.string().trim().max(1000).nullable().optional(),
+  refSlug: destinationSlugSchema.nullable().optional(),
+});
+
+export const reorderItineraryItemsInputSchema = z.object({
+  dayId: z.string().min(1),
+  orderedItemIds: z.array(z.string().min(1)).min(1),
+});
+
+export type CreateTripInput = z.infer<typeof createTripInputSchema>;
+export type RenameTripInput = z.infer<typeof renameTripInputSchema>;
+export type AddItineraryItemInput = z.infer<typeof addItineraryItemInputSchema>;
+export type ReorderItineraryItemsInput = z.infer<typeof reorderItineraryItemsInputSchema>;
