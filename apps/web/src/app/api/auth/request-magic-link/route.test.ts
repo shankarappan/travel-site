@@ -15,8 +15,7 @@ vi.mock('../../../../server/email/send', () => ({
 }));
 
 vi.mock('../../../../server/identity/rate-limit', async () => {
-  const actual =
-    await vi.importActual('../../../../server/identity/rate-limit');
+  const actual = await vi.importActual('../../../../server/identity/rate-limit');
   return {
     ...(actual as object),
     assertMagicLinkRateLimit: (...args: unknown[]) => assertMagicLinkRateLimit(...args),

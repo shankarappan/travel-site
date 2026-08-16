@@ -31,8 +31,8 @@ describe('canonical auth URLs', () => {
       }),
     ).toBe('https://aotearoa.example');
 
-    expect(
-      resolveCanonicalOrigin('http://localhost:3000/api/auth/request-magic-link', {}),
-    ).toBe('http://localhost:3000');
+    expect(resolveCanonicalOrigin('http://localhost:3000/api/auth/request-magic-link', {})).toBe(
+      'http://localhost:3000',
+    );
   });
 });
