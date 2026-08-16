@@ -1,4 +1,4 @@
-import { upsertAccountFromIdentityRepo } from '@travel/db';
+import { upsertAccountFromIdentityRepo, type IssueMagicLinkTokenInput } from '@travel/db';
 import type { IdentityProvider, UserAccount } from '@travel/domain';
 import { identityRepository } from '../persistence/repos';
 
@@ -10,8 +10,11 @@ export async function saveAccount(account: UserAccount): Promise<UserAccount> {
   return identityRepository().save(account);
 }
 
-export async function issueMagicLinkToken(email: string, ttlMs = 1000 * 60 * 20): Promise<string> {
-  return identityRepository().issueMagicLinkToken(email, ttlMs);
+export async function issueMagicLinkToken(
+  emailOrInput: string | IssueMagicLinkTokenInput,
+  ttlMs?: number,
+): Promise<string> {
+  return identityRepository().issueMagicLinkToken(emailOrInput, ttlMs);
 }
 
 export async function consumeMagicLinkToken(token: string): Promise<string | null> {

@@ -20,12 +20,10 @@ export default async function TripsPage() {
 
   return (
     <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-8 sm:px-6 sm:py-12">
-      <h1 className="font-[family-name:var(--travel-font-display)] text-3xl font-semibold text-[var(--travel-color-ink)]">
-        Your trips
-      </h1>
+      <h1 className="travel-h1 text-[var(--travel-color-ink)]">Your trips</h1>
       <p className="mt-2 mb-8 max-w-2xl text-[var(--travel-color-ink-soft)]">
-        Create and edit itineraries you own. Server-side ownership checks block access to other
-        travellers’ trips.
+        Gather days, notes and ideas in one calm itinerary — ready whenever inspiration turns into
+        plans.
       </p>
 
       <CreateTripForm />
@@ -42,7 +40,7 @@ export default async function TripsPage() {
               <li key={trip.id}>
                 <Link
                   href={`/trips/${trip.id}`}
-                  className="block border border-[var(--travel-color-border)] bg-[var(--travel-color-surface-elevated)] px-4 py-3 no-underline transition-colors hover:border-[var(--travel-color-fern)]"
+                  className="block rounded-[var(--travel-radius-lg)] bg-[var(--travel-color-surface-elevated)] px-5 py-4 no-underline shadow-[var(--travel-elevation-1)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--travel-elevation-2)]"
                 >
                   <span className="font-semibold text-[var(--travel-color-ink)]">{trip.title}</span>
                   <span className="mt-1 block text-sm text-[var(--travel-color-ink-soft)]">

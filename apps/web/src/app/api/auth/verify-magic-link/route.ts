@@ -1,10 +1,11 @@
 import { signIn } from '../../../../server/identity/auth';
+import { buildAppUrl } from '../../../../server/identity/urls';
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const token = url.searchParams.get('token');
   if (!token) {
-    return Response.redirect(new URL('/sign-in?error=missing_token', request.url));
+    return Response.redirect(buildAppUrl('/sign-in', request.url, { error: 'missing_token' }));
   }
 
   try {
@@ -17,8 +18,8 @@ export async function GET(request: Request) {
     if (error && typeof error === 'object' && 'digest' in error) {
       throw error;
     }
-    return Response.redirect(new URL('/sign-in?error=invalid_token', request.url));
+    return Response.redirect(buildAppUrl('/sign-in', request.url, { error: 'invalid_token' }));
   }
 
-  return Response.redirect(new URL('/account', request.url));
+  return Response.redirect(buildAppUrl('/account', request.url));
 }

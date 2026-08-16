@@ -21,6 +21,17 @@ function money(amountMinor: number, currency: string): string {
   return new Intl.NumberFormat('en-NZ', { style: 'currency', currency }).format(amountMinor / 100);
 }
 
+const PROPERTY_IMAGES: Record<string, string> = {
+  'lakeview-lodge':
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+  'fern-retreat':
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80',
+  'harbour-house':
+    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80',
+  'fiord-cabin':
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80',
+};
+
 export function StaySearchPanel() {
   const router = useRouter();
   const params = useSearchParams();
@@ -74,7 +85,6 @@ export function StaySearchPanel() {
       checkOut: params.get('checkOut') ?? '2026-12-03',
       adults: params.get('adults') ?? '2',
     });
-    // Run once on mount from URL/default search params.
   }, []);
 
   function onSubmit(event: FormEvent) {
@@ -89,9 +99,12 @@ export function StaySearchPanel() {
   );
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={onSubmit} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <Field id="destination" label="Destination">
+    <div className="space-y-8">
+      <form
+        onSubmit={onSubmit}
+        className="grid gap-3 rounded-[var(--travel-radius-xl)] bg-[var(--travel-color-surface-elevated)] p-4 shadow-[var(--travel-elevation-1)] sm:grid-cols-2 lg:grid-cols-5"
+      >
+        <Field id="destination" label="Where to">
           <Input
             id="destination"
             value={destination}
@@ -114,7 +127,7 @@ export function StaySearchPanel() {
             onChange={(e) => setCheckOut(e.target.value)}
           />
         </Field>
-        <Field id="adults" label="Adults">
+        <Field id="adults" label="Travellers">
           <Input
             id="adults"
             type="number"
@@ -125,17 +138,17 @@ export function StaySearchPanel() {
           />
         </Field>
         <div className="flex items-end">
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="min-h-11 w-full" disabled={loading}>
             {loading ? 'Searching…' : 'Search stays'}
           </Button>
         </div>
       </form>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <label className="text-sm text-[var(--travel-color-ink-soft)]">
           Sort{' '}
           <select
-            className="ml-2 rounded-[var(--travel-radius-md)] border border-[var(--travel-color-border)] bg-white px-2 py-1"
+            className="ml-2 rounded-[var(--travel-radius-md)] border border-[var(--travel-color-border)] bg-white px-2 py-2"
             value={sort}
             onChange={(event) => setSort(event.target.value as 'price' | 'name')}
           >
@@ -143,69 +156,78 @@ export function StaySearchPanel() {
             <option value="name">Name</option>
           </select>
         </label>
-        <span className="text-sm text-[var(--travel-color-ink-soft)]">
-          List view · map toggle coming later
-        </span>
+        <p className="text-sm text-[var(--travel-color-ink-muted)]">
+          Sample stays for exploring the experience
+        </p>
       </div>
 
       {loading ? (
-        <div className="grid gap-3">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Skeleton className="h-64 w-full rounded-[var(--travel-radius-lg)]" />
+          <Skeleton className="h-64 w-full rounded-[var(--travel-radius-lg)]" />
         </div>
       ) : null}
 
       {error ? <ErrorState message={error} onRetry={() => void runSearch()} /> : null}
 
       {!loading && !error && sorted.length === 0 ? (
-        <EmptyState title="No stays found" description="Try another destination or date range." />
+        <EmptyState
+          title="No stays found"
+          description="Try another destination or date range — or ask the concierge for ideas."
+        />
       ) : null}
 
-      <ul className="space-y-3">
+      <ul className="grid gap-5 lg:grid-cols-2">
         {sorted.map((offer) => {
           const expired = Date.parse(offer.expiresAt) < Date.now();
+          const propertyKey = offer.offerId.split(':')[0] ?? '';
+          const image =
+            PROPERTY_IMAGES[propertyKey] ??
+            'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80';
           return (
-            <li
-              key={offer.offerId}
-              className="border border-[var(--travel-color-border)] bg-[var(--travel-color-surface-elevated)] p-4"
-            >
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-[var(--travel-color-ink)]">
-                    {offer.propertyName}
-                  </h2>
+            <li key={offer.offerId}>
+              <article className="overflow-hidden rounded-[var(--travel-radius-lg)] bg-[var(--travel-color-surface-elevated)] shadow-[var(--travel-elevation-1)]">
+                <div
+                  className="aspect-[16/10] bg-cover bg-center"
+                  style={{ backgroundImage: `url(${image})` }}
+                  role="img"
+                  aria-label={`${offer.propertyName} exterior`}
+                />
+                <div className="space-y-3 p-5">
+                  <div>
+                    <h2 className="travel-h3 text-[var(--travel-color-ink)]">
+                      {offer.propertyName}
+                    </h2>
+                    <p className="mt-1 text-sm text-[var(--travel-color-ink-soft)]">
+                      {offer.roomName} · {offer.nights} nights · {offer.checkIn} → {offer.checkOut}
+                    </p>
+                  </div>
                   <p className="text-sm text-[var(--travel-color-ink-soft)]">
-                    {offer.roomName} · {offer.nights} nights · {offer.checkIn} → {offer.checkOut}
-                  </p>
-                  <p className="mt-2 text-sm text-[var(--travel-color-ink-soft)]">
                     {offer.cancellationSummary}
                   </p>
-                  <p className="mt-1 text-xs text-[var(--travel-color-ink-soft)]">
-                    Offer{' '}
-                    {expired
-                      ? 'expired'
-                      : `expires ${new Date(offer.expiresAt).toLocaleString('en-NZ')}`}
-                  </p>
+                  <div className="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                      <p className="travel-price">
+                        {money(offer.total.amountMinor, offer.total.currency)}
+                      </p>
+                      <p className="text-xs text-[var(--travel-color-ink-muted)]">
+                        Includes taxes & fees ·{' '}
+                        {expired
+                          ? 'Offer expired'
+                          : `Hold until ${new Date(offer.expiresAt).toLocaleString('en-NZ')}`}
+                      </p>
+                    </div>
+                    <Button
+                      disabled={expired}
+                      onClick={() => {
+                        router.push(`/checkout?offerId=${encodeURIComponent(offer.offerId)}`);
+                      }}
+                    >
+                      Review stay
+                    </Button>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xl font-semibold">
-                    {money(offer.total.amountMinor, offer.total.currency)}
-                  </p>
-                  <p className="text-xs text-[var(--travel-color-ink-soft)]">
-                    incl. taxes/fees{' '}
-                    {money(offer.taxesAndFees.amountMinor, offer.taxesAndFees.currency)}
-                  </p>
-                  <Button
-                    className="mt-3"
-                    disabled={expired}
-                    onClick={() => {
-                      router.push(`/checkout?offerId=${encodeURIComponent(offer.offerId)}`);
-                    }}
-                  >
-                    Review quote
-                  </Button>
-                </div>
-              </div>
+              </article>
             </li>
           );
         })}

@@ -25,21 +25,21 @@ export function AppShell({ brand, navItems, actions, children, footer, className
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-30 border-b border-[var(--travel-color-border)]/70 bg-[rgb(247_250_249_/0.88)] backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-[var(--travel-color-border)]/50 bg-[rgb(246_245_242_/0.86)] backdrop-blur-xl">
         <div className="mx-auto flex min-h-[var(--travel-nav-height)] max-w-[var(--travel-shell-max)] items-center justify-between gap-4 px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-6">
+          <div className="flex min-w-0 items-center gap-8">
             <div className="shrink-0">{brand}</div>
-            <nav aria-label="Primary" className="hidden md:block">
-              <ul className="flex items-center gap-1">
+            <nav aria-label="Primary" className="hidden lg:block">
+              <ul className="flex items-center gap-0.5">
                 {navItems.map((item) => (
                   <li key={item.href}>
                     <a
                       href={item.href}
                       aria-current={item.current ? 'page' : undefined}
                       className={cn(
-                        'rounded-[var(--travel-radius-sm)] px-3 py-2 text-sm font-medium text-[var(--travel-color-ink-soft)] transition-colors duration-[var(--travel-motion-fast)] hover:text-[var(--travel-color-ink)]',
+                        'rounded-full px-3.5 py-2 text-sm font-medium text-[var(--travel-color-ink-soft)] transition-colors duration-[var(--travel-motion-fast)] hover:text-[var(--travel-color-ink)]',
                         item.current &&
-                          'bg-[var(--travel-color-glacier-soft)] text-[var(--travel-color-ink)]',
+                          'bg-[var(--travel-color-ocean-soft)] text-[var(--travel-color-ocean-strong)]',
                       )}
                     >
                       {item.label}
@@ -53,18 +53,18 @@ export function AppShell({ brand, navItems, actions, children, footer, className
         </div>
         <nav
           aria-label="Primary mobile"
-          className="border-t border-[var(--travel-color-border)]/60 md:hidden"
+          className="border-t border-[var(--travel-color-border)]/50 lg:hidden"
         >
-          <ul className="mx-auto flex max-w-[var(--travel-shell-max)] gap-1 overflow-x-auto px-3 py-2">
+          <ul className="mx-auto flex max-w-[var(--travel-shell-max)] gap-1 overflow-x-auto px-3 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {navItems.map((item) => (
               <li key={item.href} className="shrink-0">
                 <a
                   href={item.href}
                   aria-current={item.current ? 'page' : undefined}
                   className={cn(
-                    'block rounded-[var(--travel-radius-sm)] px-3 py-2 text-sm font-medium text-[var(--travel-color-ink-soft)]',
+                    'block min-h-11 rounded-full px-3.5 py-2.5 text-sm font-medium text-[var(--travel-color-ink-soft)]',
                     item.current &&
-                      'bg-[var(--travel-color-glacier-soft)] text-[var(--travel-color-ink)]',
+                      'bg-[var(--travel-color-ocean-soft)] text-[var(--travel-color-ocean-strong)]',
                   )}
                 >
                   {item.label}
@@ -76,8 +76,8 @@ export function AppShell({ brand, navItems, actions, children, footer, className
       </header>
       <main id="main-content">{children}</main>
       {footer ? (
-        <footer className="mt-auto border-t border-[var(--travel-color-border)]/70">
-          <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-8 sm:px-6">{footer}</div>
+        <footer className="mt-auto border-t border-[var(--travel-color-border)]/60 bg-[rgb(255_255_255_/0.45)]">
+          <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-10 sm:px-6">{footer}</div>
         </footer>
       ) : null}
     </div>

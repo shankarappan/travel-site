@@ -45,7 +45,7 @@ export function CheckoutClient() {
       setOrderId(data.order.id);
       setPaymentRef(data.payment.providerRef);
       setStatus(
-        `Quote ready for ${data.order.lines[0]?.propertyName}. Total ${(data.payment.amountMinor / 100).toFixed(2)} ${data.payment.currency}. Cancellation: ${data.order.lines[0]?.cancellationTerms}`,
+        `${data.order.lines[0]?.propertyName} — ${(data.payment.amountMinor / 100).toFixed(2)} ${data.payment.currency}. ${data.order.lines[0]?.cancellationTerms}`,
       );
     } catch {
       setError('Network error');
@@ -90,7 +90,11 @@ export function CheckoutClient() {
         return;
       }
       setStatus(
-        `Payment succeeded. Booking ${bookingData.order?.status} (${bookingData.order?.providerBookingId ?? 'n/a'}). Confirmation email queued.`,
+        `You’re booked. Confirmation is on its way${
+          bookingData.order?.providerBookingId
+            ? ` (ref ${bookingData.order.providerBookingId})`
+            : ''
+        }.`,
       );
     } catch {
       setError('Network error during payment/booking');
@@ -100,21 +104,20 @@ export function CheckoutClient() {
   }
 
   if (!offerId) {
-    return <ErrorState message="Missing offerId. Start from stay search." />;
+    return <ErrorState message="Choose a stay from search to continue." />;
   }
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-[var(--travel-color-ink-soft)]">
-        Checkout reprices before commitment. Card data never touches our servers (hosted/tokenized
-        sandbox).
+        We’ll reconfirm the total and cancellation terms before you pay.
       </p>
       <Button disabled={pending} onClick={startCheckout}>
-        Reprice and create payment session
+        Confirm price and continue
       </Button>
       {paymentRef ? (
         <Button disabled={pending} variant="secondary" onClick={simulatePaymentSuccess}>
-          Simulate sandbox payment success + book
+          Complete sample payment
         </Button>
       ) : null}
       {status ? <p className="text-sm text-[var(--travel-color-ink)]">{status}</p> : null}

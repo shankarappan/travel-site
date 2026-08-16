@@ -12,11 +12,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClass: Record<ButtonVariant, string> = {
   primary:
-    'travel-btn-primary bg-[var(--travel-color-fern)] text-white hover:bg-[var(--travel-color-fern-strong)]',
+    'travel-btn-primary bg-[var(--travel-color-ocean)] text-white hover:bg-[var(--travel-color-ocean-strong)] shadow-[var(--travel-elevation-1)]',
   secondary:
-    'bg-[var(--travel-color-surface-elevated)] text-[var(--travel-color-ink)] border border-[var(--travel-color-border)] hover:border-[var(--travel-color-fern)]',
-  ghost:
-    'bg-transparent text-[var(--travel-color-ink)] hover:bg-[var(--travel-color-glacier-soft)]',
+    'bg-[var(--travel-color-surface-elevated)] text-[var(--travel-color-ink)] border border-[var(--travel-color-border)] hover:border-[var(--travel-color-ocean)]',
+  ghost: 'bg-transparent text-[var(--travel-color-ink)] hover:bg-[var(--travel-color-ocean-soft)]',
   danger: 'bg-[var(--travel-color-danger)] text-white hover:opacity-90',
 };
 

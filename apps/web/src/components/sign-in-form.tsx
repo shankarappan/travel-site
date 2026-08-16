@@ -4,6 +4,31 @@ import { Button, Field, Input } from '@travel/ui';
 import { useSearchParams } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
+async function startOAuth(provider: 'google' | 'apple') {
+  const csrfResponse = await fetch('/api/auth/csrf');
+  const csrfData = (await csrfResponse.json()) as { csrfToken?: string };
+  if (!csrfData.csrfToken) {
+    throw new Error('Missing CSRF token');
+  }
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = `/api/auth/signin/${provider}`;
+  form.style.display = 'none';
+
+  const csrf = document.createElement('input');
+  csrf.name = 'csrfToken';
+  csrf.value = csrfData.csrfToken;
+  form.appendChild(csrf);
+
+  const callback = document.createElement('input');
+  callback.name = 'callbackUrl';
+  callback.value = '/account';
+  form.appendChild(callback);
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
 export function SignInForm({
   googleEnabled,
   appleEnabled,
@@ -17,6 +42,7 @@ export function SignInForm({
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'failed'>('idle');
   const [devLink, setDevLink] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [oauthPending, setOauthPending] = useState<'google' | 'apple' | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -51,6 +77,19 @@ export function SignInForm({
     }
   }
 
+  async function onOAuth(provider: 'google' | 'apple') {
+    setOauthPending(provider);
+    setMessage(null);
+    try {
+      await startOAuth(provider);
+    } catch {
+      setOauthPending(null);
+      setMessage(`Could not start ${provider} sign-in`);
+    }
+  }
+
+  const showOauthSection = googleEnabled || appleEnabled;
+
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-6">
       {error ? (
@@ -81,35 +120,39 @@ export function SignInForm({
       {devLink ? (
         <p className="break-all text-sm">
           Dev magic link:{' '}
-          <a className="font-semibold text-[var(--travel-color-fern)] underline" href={devLink}>
+          <a className="font-semibold text-[var(--travel-color-ocean)] underline" href={devLink}>
             Continue sign-in
           </a>
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-2">
-        <p className="text-xs uppercase tracking-[0.14em] text-[var(--travel-color-ink-soft)]">
-          Or continue with
-        </p>
-        {googleEnabled ? (
-          <Button asChild variant="secondary">
-            <a href="/api/auth/signin/google">Google</a>
-          </Button>
-        ) : (
-          <Button type="button" variant="secondary" disabled>
-            Google (configure AUTH_GOOGLE_ID/SECRET)
-          </Button>
-        )}
-        {appleEnabled ? (
-          <Button asChild variant="secondary">
-            <a href="/api/auth/signin/apple">Apple</a>
-          </Button>
-        ) : (
-          <Button type="button" variant="secondary" disabled>
-            Apple (configure AUTH_APPLE_ID/SECRET)
-          </Button>
-        )}
-      </div>
+      {showOauthSection ? (
+        <div className="flex flex-col gap-2">
+          <p className="text-xs uppercase tracking-[0.14em] text-[var(--travel-color-ink-soft)]">
+            Or continue with
+          </p>
+          {googleEnabled ? (
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={oauthPending !== null}
+              onClick={() => void onOAuth('google')}
+            >
+              {oauthPending === 'google' ? 'Continuing…' : 'Google'}
+            </Button>
+          ) : null}
+          {appleEnabled ? (
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={oauthPending !== null}
+              onClick={() => void onOAuth('apple')}
+            >
+              {oauthPending === 'apple' ? 'Continuing…' : 'Apple'}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

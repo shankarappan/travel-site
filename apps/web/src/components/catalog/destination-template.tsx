@@ -42,23 +42,30 @@ export function DestinationTemplate({
         </section>
 
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          <section className="border border-[var(--travel-color-border)] bg-[var(--travel-color-surface-elevated)] p-4">
-            <h2 className="font-semibold text-[var(--travel-color-ink)]">Accommodation</h2>
+          <section className="rounded-[var(--travel-radius-lg)] bg-[var(--travel-color-surface-elevated)] p-5 shadow-[var(--travel-elevation-1)]">
+            <h2 className="font-semibold text-[var(--travel-color-ink)]">Places to stay</h2>
             <p className="mt-2 text-sm text-[var(--travel-color-ink-soft)]">
-              {destination.accommodationPlaceholder}
+              Explore stays nearby when you’re ready — totals and cancellation notes appear before
+              you commit.
             </p>
             <Link
               href={`/search?destination=${encodeURIComponent(destination.name)}`}
-              className="mt-3 inline-block text-sm font-semibold text-[var(--travel-color-fern)] underline-offset-2 hover:underline"
+              className="mt-3 inline-block text-sm font-semibold text-[var(--travel-color-ocean)] no-underline hover:underline"
             >
-              Open stay search
+              Browse stays
             </Link>
           </section>
-          <section className="border border-[var(--travel-color-border)] bg-[var(--travel-color-surface-elevated)] p-4">
-            <h2 className="font-semibold text-[var(--travel-color-ink)]">Activities</h2>
+          <section className="rounded-[var(--travel-radius-lg)] bg-[var(--travel-color-surface-elevated)] p-5 shadow-[var(--travel-elevation-1)]">
+            <h2 className="font-semibold text-[var(--travel-color-ink)]">Things to do</h2>
             <p className="mt-2 text-sm text-[var(--travel-color-ink-soft)]">
-              {destination.activitiesPlaceholder}
+              Local experiences and day ideas will gather here as your journey takes shape.
             </p>
+            <Link
+              href={`/concierge?q=${encodeURIComponent(`What should I do in ${destination.name}?`)}`}
+              className="mt-3 inline-block text-sm font-semibold text-[var(--travel-color-ocean)] no-underline hover:underline"
+            >
+              Ask the concierge
+            </Link>
           </section>
         </div>
 
@@ -76,7 +83,7 @@ export function DestinationTemplate({
                 <li key={guide.slug}>
                   <Link
                     href={`/guides/${guide.slug}`}
-                    className="font-semibold text-[var(--travel-color-fern)] underline-offset-2 hover:underline"
+                    className="font-semibold text-[var(--travel-color-ocean)] no-underline hover:underline"
                   >
                     {guide.title}
                   </Link>

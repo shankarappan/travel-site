@@ -2,6 +2,7 @@ node_modules
 dist
 .next
 .turbo
+.vercel
 coverage
 storybook-static
 .env

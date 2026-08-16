@@ -10,7 +10,12 @@ import {
   type UserAccount,
 } from '@travel/domain';
 import type { DbPool } from '../pool.js';
-import type { IdentityRepository } from './types.js';
+import { generateMagicLinkToken, hashMagicLinkToken } from './magic-link-token.js';
+import type {
+  CountMagicLinkRequestsInput,
+  IdentityRepository,
+  IssueMagicLinkTokenInput,
+} from './types.js';
 
 type UserRow = {
   id: string;
@@ -138,17 +143,29 @@ export class PostgresIdentityRepository implements IdentityRepository {
     return (await this.getById(account.id.value)) ?? account;
   }
 
-  async issueMagicLinkToken(email: string, ttlMs = 1000 * 60 * 20): Promise<string> {
-    const token = crypto.randomUUID();
+  async issueMagicLinkToken(
+    emailOrInput: string | IssueMagicLinkTokenInput,
+    ttlMsLegacy?: number,
+  ): Promise<string> {
+    const input: IssueMagicLinkTokenInput =
+      typeof emailOrInput === 'string' ? { email: emailOrInput, ttlMs: ttlMsLegacy } : emailOrInput;
+    const ttlMs = input.ttlMs ?? 1000 * 60 * 20;
+    const rawToken = generateMagicLinkToken();
+    const tokenHash = hashMagicLinkToken(rawToken);
     const expiresAt = new Date(Date.now() + ttlMs).toISOString();
     await this.pool.query(
-      `INSERT INTO magic_link_tokens (token, email, expires_at) VALUES ($1, $2, $3::timestamptz)`,
-      [token, normalizeEmail(email), expiresAt],
+      `
+      INSERT INTO magic_link_tokens (token_hash, email, expires_at, request_ip)
+      VALUES ($1, $2, $3::timestamptz, $4)
+      `,
+      [tokenHash, normalizeEmail(input.email), expiresAt, input.requestIp ?? null],
     );
-    return token;
+    return rawToken;
   }
 
   async consumeMagicLinkToken(token: string): Promise<string | null> {
+    if (!token || token.length < 16) return null;
+    const tokenHash = hashMagicLinkToken(token);
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
@@ -157,16 +174,21 @@ export class PostgresIdentityRepository implements IdentityRepository {
         expires_at: Date;
         consumed_at: Date | null;
       }>(
-        `SELECT email, expires_at, consumed_at FROM magic_link_tokens WHERE token = $1 FOR UPDATE`,
-        [token],
+        `
+        SELECT email, expires_at, consumed_at
+        FROM magic_link_tokens
+        WHERE token_hash = $1
+        FOR UPDATE
+        `,
+        [tokenHash],
       );
       const row = result.rows[0];
       if (!row || row.consumed_at || row.expires_at.getTime() < Date.now()) {
         await client.query('ROLLBACK');
         return null;
       }
-      await client.query(`UPDATE magic_link_tokens SET consumed_at = now() WHERE token = $1`, [
-        token,
+      await client.query(`UPDATE magic_link_tokens SET consumed_at = now() WHERE token_hash = $1`, [
+        tokenHash,
       ]);
       await client.query('COMMIT');
       return row.email;
@@ -176,6 +198,33 @@ export class PostgresIdentityRepository implements IdentityRepository {
     } finally {
       client.release();
     }
+  }
+
+  async countRecentMagicLinkRequests(input: CountMagicLinkRequestsInput): Promise<number> {
+    const since = new Date(Date.now() - input.windowMs).toISOString();
+    if (input.email) {
+      const result = await this.pool.query<{ count: string }>(
+        `
+        SELECT COUNT(*)::text AS count
+        FROM magic_link_tokens
+        WHERE email = $1 AND created_at >= $2::timestamptz
+        `,
+        [normalizeEmail(input.email), since],
+      );
+      return Number(result.rows[0]?.count ?? 0);
+    }
+    if (input.requestIp) {
+      const result = await this.pool.query<{ count: string }>(
+        `
+        SELECT COUNT(*)::text AS count
+        FROM magic_link_tokens
+        WHERE request_ip = $1 AND created_at >= $2::timestamptz
+        `,
+        [input.requestIp, since],
+      );
+      return Number(result.rows[0]?.count ?? 0);
+    }
+    return 0;
   }
 }
 
