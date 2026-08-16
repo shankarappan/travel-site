@@ -8,7 +8,7 @@ Derived from the Technical Blueprint Definition of Done and Feature Prompt Libra
 - [x] TypeScript strict mode, lint, format, unit tests, CI
 - [x] Environment validation + structured logging
 - [x] Architecture README + modular-monolith ADR
-- [ ] Design system + responsive application shell (Prompt 02)
+- [x] Design system + responsive application shell (Prompt 02)
 
 ## Identity & privacy
 

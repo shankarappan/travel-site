@@ -7,7 +7,16 @@ const nextConfig: NextConfig = {
     '@travel/providers',
     '@travel/ai',
     '@travel/observability',
+    '@travel/ui',
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

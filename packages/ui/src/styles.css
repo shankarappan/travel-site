@@ -1,0 +1,74 @@
+@import './tokens.css';
+
+.travel-ui {
+  color: var(--travel-color-ink);
+  font-family: var(--travel-font-body);
+  background:
+    radial-gradient(120% 80% at 10% -10%, rgb(79 154 171 / 18%), transparent 55%),
+    radial-gradient(90% 70% at 100% 0%, rgb(31 107 79 / 12%), transparent 50%),
+    linear-gradient(180deg, var(--travel-color-mist), var(--travel-color-surface));
+  min-height: 100vh;
+}
+
+.travel-ui *,
+.travel-ui *::before,
+.travel-ui *::after {
+  box-sizing: border-box;
+}
+
+.travel-ui a {
+  color: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.travel-ui :focus-visible {
+  outline: 2px solid var(--travel-color-focus);
+  outline-offset: 2px;
+}
+
+@keyframes travel-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes travel-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes travel-reveal {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.travel-animate-fade-up {
+  animation: travel-fade-up var(--travel-motion-slow) var(--travel-ease) both;
+}
+
+.travel-animate-reveal {
+  animation: travel-reveal calc(var(--travel-motion-slow) + 120ms) var(--travel-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel-animate-fade-up,
+  .travel-animate-reveal {
+    animation: none;
+  }
+}
