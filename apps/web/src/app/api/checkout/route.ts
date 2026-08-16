@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       offerId: parsed.data.offerId,
       idempotencyKey: parsed.data.idempotencyKey,
     });
-    const payment = createPaymentSession(order);
+    const payment = await createPaymentSession(order);
     return NextResponse.json({
       order,
       quoteId,

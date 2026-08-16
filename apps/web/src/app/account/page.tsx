@@ -14,7 +14,7 @@ export default async function AccountPage() {
     redirect('/sign-in');
   }
 
-  const account = getAccountById(session.user.id);
+  const account = await getAccountById(session.user.id);
 
   return (
     <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-10 sm:px-6 sm:py-14">

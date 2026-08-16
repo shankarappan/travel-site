@@ -12,7 +12,7 @@ export default async function UnsubscribePage({
 }) {
   const params = await searchParams;
   const token = params.token;
-  const event = token ? withdrawByUnsubscribeToken(token) : null;
+  const event = token ? await withdrawByUnsubscribeToken(token) : null;
 
   return (
     <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-10 sm:px-6 sm:py-14">

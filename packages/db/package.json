@@ -1,0 +1,32 @@
+{
+  "name": "@travel/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run",
+    "migrate": "tsx src/migrate-cli.ts"
+  },
+  "dependencies": {
+    "@travel/domain": "workspace:*",
+    "@travel/observability": "workspace:*",
+    "pg": "^8.23.0",
+    "zod": "^3.25.51"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.1",
+    "tsx": "^4.19.4"
+  }
+}

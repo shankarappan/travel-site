@@ -6,7 +6,7 @@ import { createTripForUser, listTripsForUser } from '../../../server/trips/store
 export async function GET() {
   const authResult = await requireUserId();
   if ('response' in authResult) return authResult.response;
-  const trips = listTripsForUser(authResult.userId).map(serializeTrip);
+  const trips = (await listTripsForUser(authResult.userId)).map(serializeTrip);
   return NextResponse.json({ trips });
 }
 
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const trip = createTripForUser(authResult.userId, parsed.data.title);
+    const trip = await createTripForUser(authResult.userId, parsed.data.title);
     return NextResponse.json({ trip: serializeTrip(trip) }, { status: 201 });
   } catch (error) {
     return tripErrorResponse(error);

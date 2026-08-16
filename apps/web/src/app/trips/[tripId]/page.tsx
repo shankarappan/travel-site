@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   const { tripId } = await params;
   try {
-    const trip = getTripForUser(tripId, session.user.id);
+    const trip = await getTripForUser(tripId, session.user.id);
     return { title: trip.title };
   } catch {
     return { title: 'Trip' };
@@ -29,7 +29,7 @@ export default async function TripDetailPage({ params }: PageProps) {
 
   const { tripId } = await params;
   try {
-    const trip = getTripForUser(tripId, session.user.id);
+    const trip = await getTripForUser(tripId, session.user.id);
     return (
       <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-8 sm:px-6 sm:py-12">
         <p className="mb-4 text-sm">

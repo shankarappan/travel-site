@@ -1,42 +1,47 @@
-import { consentLedger } from '@travel/consent';
+import type {
+  ConsentChannel,
+  ConsentEvent,
+  ConsentPurpose,
+  ConsentSource,
+  ConsentStatus,
+} from '@travel/domain';
+import { consentRepository } from '../persistence/repos';
 
-export { consentLedger as default, consentLedger };
-
-export function resetConsentStore(): void {
-  consentLedger.reset();
+export async function ensureTransactionalConsent(userId: string): Promise<void> {
+  await consentRepository().ensureTransactional(userId);
 }
 
-export function listConsentEvents(userId: string) {
-  return consentLedger.listEvents(userId);
+export async function recordConsent(input: {
+  userId: string;
+  purpose: ConsentPurpose;
+  channel: ConsentChannel;
+  granted: boolean;
+  source: ConsentSource;
+  evidence: string;
+  policyVersion?: string;
+}): Promise<ConsentEvent> {
+  return consentRepository().record(input);
 }
 
-export function getConsentStatuses(userId: string) {
-  return consentLedger.getStatuses(userId);
+export async function getConsentStatuses(userId: string): Promise<ConsentStatus[]> {
+  return consentRepository().getStatuses(userId);
 }
 
-export function recordConsent(input: Parameters<typeof consentLedger.record>[0]) {
-  return consentLedger.record(input);
+export async function listConsentEvents(userId: string): Promise<ConsentEvent[]> {
+  return consentRepository().listEvents(userId);
 }
 
-export function ensureTransactionalConsent(userId: string): void {
-  consentLedger.ensureTransactional(userId);
-}
-
-export function issueUnsubscribeToken(
+export async function issueUnsubscribeToken(
   userId: string,
-  purpose: Parameters<typeof consentLedger.issueUnsubscribeToken>[1],
-) {
-  return consentLedger.issueUnsubscribeToken(userId, purpose);
+  purpose: ConsentPurpose,
+): Promise<string> {
+  return consentRepository().issueUnsubscribeToken(userId, purpose);
 }
 
-export function withdrawByUnsubscribeToken(token: string) {
-  return consentLedger.withdrawByUnsubscribeToken(token);
+export async function withdrawByUnsubscribeToken(token: string): Promise<ConsentEvent | null> {
+  return consentRepository().withdrawByUnsubscribeToken(token);
 }
 
-export function maySend(userId: string, purpose: Parameters<typeof consentLedger.maySend>[1]) {
-  return consentLedger.maySend(userId, purpose);
-}
-
-export function listAllConsentLedgers() {
-  return consentLedger.listAll();
+export async function maySend(userId: string, purpose: ConsentPurpose): Promise<boolean> {
+  return consentRepository().maySend(userId, purpose);
 }

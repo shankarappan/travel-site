@@ -24,11 +24,11 @@ const providers: Provider[] = [
     },
     async authorize(credentials) {
       const token = typeof credentials?.token === 'string' ? credentials.token : '';
-      const email = consumeMagicLinkToken(token);
+      const email = await consumeMagicLinkToken(token);
       if (!email) {
         return null;
       }
-      const account = upsertAccountFromIdentity({
+      const account = await upsertAccountFromIdentity({
         provider: 'email',
         providerSubject: email,
         email,
@@ -74,7 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!account) return false;
       if (account.provider === 'magic-link') return true;
       try {
-        upsertAccountFromIdentity({
+        await upsertAccountFromIdentity({
           provider: mapProvider(account.provider),
           providerSubject: account.providerAccountId,
           email: user.email ?? null,
@@ -95,7 +95,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return token;
       }
       if (account && user) {
-        const internal = upsertAccountFromIdentity({
+        const internal = await upsertAccountFromIdentity({
           provider: mapProvider(account.provider),
           providerSubject: account.providerAccountId,
           email: user.email ?? null,

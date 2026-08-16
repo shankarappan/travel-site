@@ -1,22 +1,19 @@
-import { consentLedger } from '@travel/consent';
+import { getPool, PostgresConsentRepository } from '@travel/db';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Consent visibility',
 };
 
-export default function AdminConsentPage() {
-  const ledgers = consentLedger.listAll();
+export default async function AdminConsentPage() {
+  const ledgers = await new PostgresConsentRepository(getPool()).listAll();
 
   return (
     <main style={{ padding: '2rem', maxWidth: '56rem' }}>
       <h1>Consent ledger</h1>
-      <p>
-        Admin visibility into consent events. Shared in-memory ledger is process-local until
-        Postgres-backed storage lands.
-      </p>
+      <p>Admin visibility into consent events stored in Postgres.</p>
       {ledgers.length === 0 ? (
-        <p>No consent events recorded in this process yet.</p>
+        <p>No consent events recorded yet.</p>
       ) : (
         <ul>
           {ledgers.map((ledger) => (

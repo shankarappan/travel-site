@@ -1,43 +1,18 @@
-import {
-  advanceOrder,
-  createOrder,
-  type Order,
-  type PaymentRecord,
-  type PaymentStatus,
-} from '@travel/domain';
-import { getDefaultAccommodationProvider } from '@travel/providers';
+import { advanceOrder, createOrder, type Order, type PaymentRecord, type PaymentStatus } from '@travel/domain';
 import { createLogger } from '@travel/observability';
+import { getDefaultAccommodationProvider } from '@travel/providers';
+import { commerceRepository } from '../persistence/repos';
 
 const logger = createLogger({ service: 'commerce' });
 const provider = getDefaultAccommodationProvider();
-
-const orders = new Map<string, Order>();
-const payments = new Map<string, PaymentRecord>();
-const webhookEvents = new Set<string>();
-const emailIntents: Array<{
-  id: string;
-  template: string;
-  version: string;
-  to: string;
-  status: 'queued' | 'sent' | 'failed';
-  providerMessageId: string | null;
-}> = [];
-
-export function resetCommerceStore(): void {
-  orders.clear();
-  payments.clear();
-  webhookEvents.clear();
-  emailIntents.length = 0;
-}
 
 export async function createQuotedOrder(input: {
   userId: string;
   offerId: string;
   idempotencyKey: string;
 }): Promise<{ order: Order; quoteId: string }> {
-  const existing = [...orders.values()].find(
-    (order) => order.userId.value === input.userId && order.idempotencyKey === input.idempotencyKey,
-  );
+  const repo = commerceRepository();
+  const existing = await repo.findOrderByIdempotency(input.userId, input.idempotencyKey);
   if (existing) {
     return { order: existing, quoteId: existing.quoteId ?? '' };
   }
@@ -59,19 +34,22 @@ export async function createQuotedOrder(input: {
       },
     ],
   });
-  orders.set(order.id, order);
-  return { order, quoteId: quote.quoteId };
+  const saved = await repo.saveOrder(order);
+  await repo.recordStatusTransition({
+    orderId: saved.id,
+    fromStatus: null,
+    toStatus: saved.status,
+    reason: 'quote_created',
+  });
+  return { order: saved, quoteId: quote.quoteId };
 }
 
-export function getOrderForUser(orderId: string, userId: string): Order {
-  const order = orders.get(orderId);
-  if (!order || order.userId.value !== userId) {
-    throw new Error('Order not found');
-  }
-  return order;
+export async function getOrderForUser(orderId: string, userId: string): Promise<Order> {
+  return commerceRepository().getOrderForUser(orderId, userId);
 }
 
-export function createPaymentSession(order: Order): PaymentRecord {
+export async function createPaymentSession(order: Order): Promise<PaymentRecord> {
+  const repo = commerceRepository();
   const line = order.lines[0];
   if (!line) throw new Error('Order has no lines');
   const payment: PaymentRecord = {
@@ -84,67 +62,126 @@ export function createPaymentSession(order: Order): PaymentRecord {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-  payments.set(payment.id, payment);
+  await repo.savePayment(payment);
   const pending = advanceOrder(order, 'PAYMENT_PENDING', { paymentId: payment.id });
-  orders.set(order.id, pending);
+  await repo.saveOrder(pending);
+  await repo.recordStatusTransition({
+    orderId: order.id,
+    fromStatus: order.status,
+    toStatus: pending.status,
+    reason: 'payment_session_created',
+  });
   return payment;
 }
 
-export function handlePaymentWebhook(input: {
+export async function handlePaymentWebhook(input: {
   eventId: string;
   signature: string;
   providerRef: string;
   status: PaymentStatus;
-}): { duplicate: boolean; order?: Order } {
+}): Promise<{ duplicate: boolean; order?: Order }> {
   if (input.signature !== 'sandbox_secret') {
     throw new Error('Invalid webhook signature');
   }
-  if (webhookEvents.has(input.eventId)) {
+  const repo = commerceRepository();
+  const recorded = await repo.recordWebhookEvent({
+    eventId: input.eventId,
+    source: 'payments',
+    providerRef: input.providerRef,
+    status: input.status,
+  });
+  if (recorded.duplicate) {
     return { duplicate: true };
   }
-  webhookEvents.add(input.eventId);
 
-  const payment = [...payments.values()].find((item) => item.providerRef === input.providerRef);
+  const payment = await repo.findPaymentByProviderRef(input.providerRef);
   if (!payment) {
     throw new Error('Payment not found');
   }
-  const updatedPayment = {
+  await repo.savePayment({
     ...payment,
     status: input.status,
     updatedAt: new Date().toISOString(),
-  };
-  payments.set(payment.id, updatedPayment);
+  });
 
-  const order = orders.get(payment.orderId);
+  const order = await repo.getOrderById(payment.orderId);
   if (!order) throw new Error('Order missing for payment');
 
   if (input.status === 'succeeded') {
+    if (order.status === 'PAID' || order.status === 'SUPPLIER_PENDING' || order.status === 'CONFIRMED') {
+      return { duplicate: false, order };
+    }
     const paid = advanceOrder(order, 'PAID');
-    orders.set(order.id, paid);
-    queueEmail({
+    await repo.saveOrder(paid);
+    await repo.recordStatusTransition({
+      orderId: order.id,
+      fromStatus: order.status,
+      toStatus: paid.status,
+      reason: 'payment_webhook_succeeded',
+    });
+    await repo.queueEmail({
       template: 'booking.payment_received',
       version: '1.0.0',
       to: 'guest@example.com',
+      orderId: order.id,
     });
     return { duplicate: false, order: paid };
   }
   if (input.status === 'failed') {
     const failed = advanceOrder(order, 'FAILED');
-    orders.set(order.id, failed);
+    await repo.saveOrder(failed);
+    await repo.recordStatusTransition({
+      orderId: order.id,
+      fromStatus: order.status,
+      toStatus: failed.status,
+      reason: 'payment_webhook_failed',
+    });
     return { duplicate: false, order: failed };
   }
   return { duplicate: false, order };
 }
 
 export async function confirmProviderBooking(orderId: string, userId: string): Promise<Order> {
-  const order = getOrderForUser(orderId, userId);
+  const repo = commerceRepository();
+  const order = await repo.getOrderForUser(orderId, userId);
+  if (order.status === 'CONFIRMED' && order.providerBookingId) {
+    return order;
+  }
   if (order.status !== 'PAID' && order.status !== 'SUPPLIER_PENDING') {
     throw new Error('Order must be paid before supplier booking');
   }
   if (!order.quoteId) throw new Error('Missing quote');
 
-  const pending = advanceOrder(order, 'SUPPLIER_PENDING');
-  orders.set(order.id, pending);
+  const bookingKey = `book_${order.idempotencyKey}`;
+  const claim = await repo.saveBookingAttempt({
+    id: crypto.randomUUID(),
+    orderId: order.id,
+    idempotencyKey: bookingKey,
+    providerBookingId: order.providerBookingId,
+    status: 'pending',
+  });
+
+  if (!claim.created && claim.status === 'confirmed' && claim.providerBookingId) {
+    const pending =
+      order.status === 'SUPPLIER_PENDING' ? order : advanceOrder(order, 'SUPPLIER_PENDING');
+    const confirmed = advanceOrder(pending, 'CONFIRMED', {
+      providerBookingId: claim.providerBookingId,
+    });
+    await repo.saveOrder(confirmed);
+    return confirmed;
+  }
+
+  const pending =
+    order.status === 'SUPPLIER_PENDING' ? order : advanceOrder(order, 'SUPPLIER_PENDING');
+  if (order.status !== 'SUPPLIER_PENDING') {
+    await repo.saveOrder(pending);
+    await repo.recordStatusTransition({
+      orderId: order.id,
+      fromStatus: order.status,
+      toStatus: pending.status,
+      reason: 'supplier_booking_started',
+    });
+  }
 
   const result = await provider.book(
     {
@@ -152,50 +189,65 @@ export async function confirmProviderBooking(orderId: string, userId: string): P
       guestName: 'Guest Traveller',
       guestEmail: 'guest@example.com',
     },
-    `book_${order.idempotencyKey}`,
+    bookingKey,
   );
+
+  await repo.saveBookingAttempt({
+    id: crypto.randomUUID(),
+    orderId: order.id,
+    idempotencyKey: bookingKey,
+    providerBookingId: result.providerBookingId,
+    status: result.status,
+  });
 
   const confirmed = advanceOrder(pending, result.status === 'confirmed' ? 'CONFIRMED' : 'FAILED', {
     providerBookingId: result.providerBookingId,
   });
-  orders.set(order.id, confirmed);
-  queueEmail({
+  await repo.saveOrder(confirmed);
+  await repo.recordStatusTransition({
+    orderId: order.id,
+    fromStatus: pending.status,
+    toStatus: confirmed.status,
+    reason: 'supplier_booking_finished',
+  });
+  await repo.queueEmail({
     template: result.status === 'confirmed' ? 'booking.confirmed' : 'booking.failed',
     version: '1.0.0',
     to: 'guest@example.com',
+    orderId: order.id,
   });
   return confirmed;
 }
 
-export function reconcilePaidUnconfirmed(): Order[] {
-  const exceptions = [...orders.values()].filter(
-    (order) => order.status === 'PAID' || order.status === 'SUPPLIER_PENDING',
-  );
+export async function reconcilePaidUnconfirmed(): Promise<Order[]> {
+  const exceptions = await commerceRepository().listPaidUnconfirmed();
   for (const order of exceptions) {
-    logger.warn('commerce.paid_but_unconfirmed', { orderId: order.id, status: order.status });
+    logger.warn('commerce.paid_but_unconfirmed', {
+      orderId: order.id,
+      status: order.status,
+      paymentId: order.paymentId,
+    });
   }
   return exceptions;
 }
 
-export function queueEmail(input: { template: string; version: string; to: string }) {
-  emailIntents.push({
-    id: `email_${crypto.randomUUID()}`,
-    template: input.template,
-    version: input.version,
-    to: input.to,
-    status: 'sent',
-    providerMessageId: `msg_${crypto.randomUUID()}`,
-  });
+export async function queueEmail(input: {
+  template: string;
+  version: string;
+  to: string;
+  orderId?: string | null;
+}) {
+  return commerceRepository().queueEmail(input);
 }
 
-export function listEmailIntents() {
-  return [...emailIntents];
+export async function listEmailIntents() {
+  return commerceRepository().listEmailIntents();
 }
 
-export function listOrders() {
-  return [...orders.values()];
+export async function listOrders() {
+  return commerceRepository().listOrders();
 }
 
-export function getPayment(paymentId: string) {
-  return payments.get(paymentId);
+export async function getPayment(paymentId: string) {
+  return commerceRepository().getPayment(paymentId);
 }

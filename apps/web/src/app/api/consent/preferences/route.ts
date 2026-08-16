@@ -25,11 +25,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
   }
 
-  ensureTransactionalConsent(session.user.id);
+  await ensureTransactionalConsent(session.user.id);
 
   for (const [purpose, granted] of Object.entries(parsed.data.preferences)) {
     if (!allowed.has(purpose)) continue;
-    recordConsent({
+    await recordConsent({
       userId: session.user.id,
       purpose: purpose as
         'marketing_email' | 'marketing_whatsapp' | 'marketing_telegram' | 'marketing_sms',
