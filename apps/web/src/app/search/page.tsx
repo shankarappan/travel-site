@@ -1,8 +1,10 @@
-import { SearchEntry } from '@travel/ui';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { StaySearchPanel } from '../../components/stays/stay-search-panel';
 
 export const metadata: Metadata = {
   title: 'Search stays',
+  description: 'Sandbox accommodation search with normalized provider offers.',
 };
 
 export default function SearchPage() {
@@ -11,12 +13,13 @@ export default function SearchPage() {
       <h1 className="font-[family-name:var(--travel-font-display)] text-3xl font-semibold text-[var(--travel-color-ink)]">
         Search stays
       </h1>
-      <p className="mt-2 max-w-2xl text-[var(--travel-color-ink-soft)]">
-        Provider-backed results come later. This entry preserves the mobile-first search pattern.
+      <p className="mt-2 mb-8 max-w-2xl text-[var(--travel-color-ink-soft)]">
+        Results come from the fake sandbox provider. Totals include taxes/fees and show offer
+        expiry.
       </p>
-      <div className="mt-6 travel-animate-fade-up">
-        <SearchEntry />
-      </div>
+      <Suspense fallback={<p>Loading search…</p>}>
+        <StaySearchPanel />
+      </Suspense>
     </div>
   );
 }

@@ -10,6 +10,7 @@ const links = [
   { href: '/destinations', label: 'Destinations' },
   { href: '/search', label: 'Stays' },
   { href: '/trips', label: 'Trips' },
+  { href: '/concierge', label: 'Concierge' },
   { href: '/design-system', label: 'Design system' },
 ];
 

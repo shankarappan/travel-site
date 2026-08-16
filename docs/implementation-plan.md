@@ -1,106 +1,61 @@
-# Implementation plan (post Prompt 04 review)
+# Implementation plan
 
-Status: **planning complete — await go-ahead before Prompt 05+**
-Sources of truth: Technical Blueprint v1.0, `docs/product/cursor-master-prompt.md`, Feature Prompt Library (uploaded), this checklist.
+Status: **Prompts 01–25 scaffolded on branch** (sandbox/in-memory limits still apply).
+Sources of truth: Technical Blueprint v1.0, `docs/product/cursor-master-prompt.md`, Feature Prompt Library, this checklist.
 
-Working agreement for remaining work:
+Working agreement:
 1. Re-read Master Prompt + relevant Blueprint sections before each Feature Prompt.
-2. State the smallest change set, implement, add tests, run lint/typecheck/test/build.
-3. One Feature Prompt at a time → review/test → then next.
-4. No live Booking.com / payment production paths until sandbox + reconciliation proven.
-5. Prefer durable Postgres-backed stores before multi-instance deploys (identity + consent are still in-memory).
+2. Prefer durable Postgres-backed stores before multi-instance deploys.
+3. No live Booking.com / payment production paths until sandbox + reconciliation proven.
+4. AI never invents live prices or availability.
 
 ---
 
-## Review of Prompts 01–04 (what landed vs gaps)
+## Prompts 01–06 — complete
 
-### Prompt 01 — Repository foundation — **largely complete**
-**Done:** monorepo (`apps/web`, `apps/admin`), packages domain/api-contracts/providers/ai/observability (+ later ui/consent), TS strict, ESLint, Prettier, Vitest, Turbo, CI, env validation, structured logs, architecture README, ADR 0001.
-**Gaps / harden later:** no `04_CODEX_DEVELOPMENT_PLAYBOOK.md` was supplied (noted); secrets scanning not yet a CI step; OpenTelemetry is hooks-only (logs), not full tracing.
-
-### Prompt 02 — Design system + shell — **complete for MVP**
-**Done:** `@travel/ui` tokens, shell, nav, search entry, forms, dialog, skeleton, empty/error, reduced-motion, `/design-system` review surface, responsive hero.
-**Gaps:** not Storybook (equivalent page used); a11y/visual regression snapshots not automated; admin UI does not yet share the design system.
-
-### Prompt 03 — Identity — **functional MVP, not production-durable**
-**Done:** Auth.js, magic-link passwordless, Google/Apple gated on server env, linking policy + tests, sessions, logout, roles on JWT, `/sign-in` `/account`, ADR 0002.
-**Gaps:** identity store is **process-local memory** (not Postgres); magic links logged in dev rather than sent via transactional email; no MFA for admin; account-linking UX for explicit “link Google to existing email” is policy-backed but not a polished multi-step UI.
-
-### Prompt 04 — Consent — **functional MVP, not production-durable**
-**Done:** append-only events (purpose/source/policy/evidence/withdrawal), transactional vs marketing split, preferences UI, unsubscribe, admin `/consent`, audit-style logs, `@travel/consent`.
-**Gaps:** in-memory ledger (web/admin processes do not share state); admin consent view is not RBAC-gated yet; no signed unsubscribe tokens (unguessable UUID only).
-
-### Quality gates (verified this review)
-`pnpm test` and `pnpm build` pass on current branch `cursor/mvp-foundation-design-system-b2cc` / PR #1.
-
----
-
-## Remaining Feature Prompts (execute in order)
-
-### Wave A — Discovery & trips (Blueprint §13, Phase 1 DoD)
-| # | Prompt | Primary deliverables | Key Blueprint anchors |
-| --- | --- | --- | --- |
-| 05 | Destination content MVP | CMS-shaped content model, NZ destination templates, SEO metadata, image a11y/source fields, map hook placeholders | Catalog domain, SSR/SEO |
-| 06 | Saved trips / itinerary | trips, days, items; CRUD + reorder; **server ownership checks** | Customer domain |
-| 07 | AI concierge read-only | tool gateway (`get_destination`, `search_content`, `get_trip`, `suggest_itinerary`), prompt versions, rate limits, persistence, eval fixtures; no invented prices | AI orchestration §8 |
-
-### Wave B — Commerce sandbox (Blueprint §5–6; no production booking claim)
-| # | Prompt | Primary deliverables |
+| # | Status | Notes |
 | --- | --- | --- |
-| 08 | Accommodation provider abstraction | normalized search/offer/quote/book interfaces + **fake/sandbox adapter** + contract tests |
-| 09 | Accommodation search UX | mobile-first search/results, filters/sort, URL state, expiry/error states |
-| 10 | Quote + checkout foundation | immutable quotes, order state machine, reprice-before-pay, cancellation display |
-| 11 | Payments | Stripe (or chosen PSP) hosted/tokenized UI, one intent per attempt, webhooks, reconciliation job |
-| 12 | Booking confirmation + reconciliation | idempotent provider book, paid-but-unconfirmed alerts |
-| 13 | Transactional email | versioned templates + delivery status (separate from marketing) |
-| 14 | Newsletter / voucher marketing | consent-qualified segments only |
+| 01 | Complete | Monorepo, CI, ADRs, packages |
+| 02 | Complete | `@travel/ui`, shell, design-system page |
+| 03 | Complete | Auth.js magic link + optional OAuth; in-memory identity |
+| 04 | Complete | Consent ledger + preferences + unsubscribe |
+| 05 | Complete | File CMS destinations/guides |
+| 06 | Complete | Trips/itinerary with ownership checks |
 
-### Wave C — Channels & ops
-| # | Prompt | Notes |
+## Prompts 07–25 — landed this wave
+
+| # | Status | Primary deliverables |
 | --- | --- | --- |
-| 15 | Conversation hub | channel-agnostic threads; no private data without verified link |
-| 16–17 | WhatsApp / Telegram | official APIs, signatures, opt-out, linking |
-| 18–19 | ElevenLabs voice | tool gateway + confirmation for high-impact; booking support only after core stable |
-| 20 | Admin operations console | RBAC timelines, support queue, refunds with reason codes |
-| 21 | Observability + runbooks | correlation IDs, metrics, alerts, runbooks |
-| 22 | PWA hardening | CWV, secure caching (never stale prices/bookings) |
+| 07 | Complete | Concierge tool gateway, persistence, rate limits, evals, `/concierge` |
+| 08 | Complete | `AccommodationProvider` + `FakeSandboxAccommodationProvider` + contract tests |
+| 09 | Complete | `/search` URL-state UX, `/api/stays/search`, sort/expiry/error states |
+| 10 | Complete | Quote reprice + order state machine + `/checkout` |
+| 11 | Complete | Sandbox payment session + signed webhook idempotency |
+| 12 | Complete | Idempotent provider book + paid-but-unconfirmed reconcile alerts |
+| 13 | Complete | Versioned transactional email intents queued on payment/booking |
+| 14 | Complete | Consent-gated newsletter subscribe + draft-requires-approval copy |
+| 15 | Complete | Channel-agnostic conversation hub + verified linking gate |
+| 16 | Complete | WhatsApp webhook adapter, HMAC verify, opt-out, consent for promo |
+| 17 | Complete | Telegram webhook adapter with private-data gate |
+| 18–19 | Complete | Voice tool route + sensitive read-back confirmation |
+| 20 | Complete | Admin ops home (no cross-app imports); RBAC MFA still open |
+| 21 | Complete | Correlation ID middleware + ops runbooks under `docs/runbooks/` |
+| 22 | Complete | Manifest, icons, SW (shell cache; commercial APIs network-only) |
+| 23 | Stub | `apps/mobile` placeholder until web APIs stabilize |
+| 24 | Stub | `UnconfiguredFlightProvider` empty search |
+| 25 | Complete | `docs/security-privacy-launch-audit.md` (criticals block launch) |
 
-### Wave D — Explicitly later
-| # | Prompt | Gate |
-| --- | --- | --- |
-| 23 | React Native | only after web + APIs stable |
-| 24 | Flights | only after commercial access verified |
-| 25 | Security/privacy launch audit | blocks launch on criticals |
+## Accepted gaps before production
 
----
+- Identity, consent, trips, commerce, conversations remain **in-memory**.
+- Admin RBAC/MFA not enforced on mutations.
+- Magic links logged in non-production; OAuth needs real `AUTH_*` secrets.
+- Payments/bookings are **sandbox only** — do not claim live inventory/GDS.
+- Missing uploaded `04_CODEX_DEVELOPMENT_PLAYBOOK.md` (noted).
 
-## Cross-cutting work to insert before / during Wave A
+## Next hardening (post Feature Prompt library)
 
-These are not separate Feature Prompts but are required by the Blueprint and should land early so later prompts do not paint into a corner:
-
-1. **Postgres + migrations** under `infra/migrations` — replace in-memory identity and consent stores.
-2. **Repository interfaces** in domain/app services (auth, consent, catalog, trips) so adapters can move.
-3. **Shared API route conventions** + zod contracts in `@travel/api-contracts` for trips/catalog/AI tools.
-4. **Correlation ID middleware** (lightweight) ahead of Prompt 21 full observability.
-5. **Copy Feature Prompt Library + note missing Codex playbook** into `docs/product/` for agent continuity.
-
----
-
-## Proposed next execution slice (when approved)
-
-**Stop condition for the next coding turn:** complete Prompt 07 only (AI concierge read-only) after Prompt 06 is reviewed — unless told to continue the chain.
-
-### Prompt 05 — Destination content MVP — **complete**
-CMS JSON catalog via `CatalogRepository`, reusable templates, `/destinations`, `/destinations/[slug]`, `/guides/[slug]`, SEO metadata, image alt/source, map hooks, NZ fixtures.
-
-### Prompt 06 — Saved trips / itinerary — **complete**
-Trip/day/item domain, ownership-enforced store + APIs, create/rename/reorder/delete UI (no optimistic mutations).
-
----
-
-## Risks already accepted in 01–04 (must not forget)
-
-- In-memory identity/consent will lose data on restart and will not sync across web/admin processes.
-- Google/Apple require real `AUTH_*` secrets to exercise OAuth E2E.
-- Admin is not yet a secured RBAC surface.
-- No real transactional email sender for magic links in production mode.
+1. Postgres + migrations for identity/consent/trips/commerce.
+2. Enforce admin auth + role checks.
+3. Real PSP webhook secrets + reconciliation job worker.
+4. Expand AI adversarial evals and metrics export.

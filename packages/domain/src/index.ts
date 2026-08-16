@@ -43,3 +43,6 @@ export {
   renameTrip,
   reorderItineraryItems,
 } from './trip.js';
+
+export type { Order, OrderLine, PaymentRecord, PaymentStatus } from './commerce.js';
+export { advanceOrder, createOrder } from './commerce.js';

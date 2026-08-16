@@ -20,23 +20,32 @@ Derived from the Technical Blueprint Definition of Done and Feature Prompt Libra
 
 - [x] CMS-backed NZ destination content with SEO metadata
 - [x] Saved trips / itinerary builder with server-side ownership
-- [ ] AI concierge read-only tools + conversation persistence + evals
+- [x] AI concierge read-only tools + conversation persistence + evals
 
 ## Commerce (sandbox only until proven)
 
-- [ ] Accommodation provider abstraction + fake/sandbox adapter
-- [ ] Accommodation search UX (mobile-first)
-- [ ] Quote snapshots + checkout review (no fake bookings)
-- [ ] Hosted/tokenized payments + webhook verification
-- [ ] Booking confirmation + reconciliation alerts
-- [ ] Transactional email templates (versioned)
+- [x] Accommodation provider abstraction + fake/sandbox adapter
+- [x] Accommodation search UX (mobile-first)
+- [x] Quote snapshots + checkout review (no fake bookings)
+- [x] Hosted/tokenized payments + webhook verification (sandbox)
+- [x] Booking confirmation + reconciliation alerts
+- [x] Transactional email templates (versioned intents)
+- [x] Newsletter / voucher marketing gated by consent
 
 ## Channels & ops
 
-- [ ] Unified conversation hub
-- [ ] Admin operations console (RBAC)
-- [ ] Observability correlation IDs, metrics, runbooks
-- [ ] PWA hardening / Core Web Vitals budgets
+- [x] Unified conversation hub
+- [x] WhatsApp / Telegram adapters + signature/opt-out/linking hooks
+- [x] Voice tool gateway with confirmation for sensitive fields
+- [x] Admin operations console scaffold (RBAC policy documented; enforcement still open)
+- [x] Observability correlation IDs + runbooks
+- [x] PWA hardening (manifest/SW; commercial APIs network-only)
+
+## Deferred / stubs (explicit Phase 1 non-goals)
+
+- [x] React Native/Expo package stub (Prompt 23) — activate after web APIs stabilize
+- [x] Flights provider stub (Prompt 24) — empty until commercial access verified
+- [x] Security/privacy launch audit doc (Prompt 25) — criticals still block production launch
 
 ## Explicit non-goals for Phase 1 production
 

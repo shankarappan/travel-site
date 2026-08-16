@@ -12,6 +12,7 @@ export default tseslint.config(
       '**/storybook-static/**',
       '**/node_modules/**',
       '**/next-env.d.ts',
+      '**/public/sw.js',
     ],
   },
   {

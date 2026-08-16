@@ -1,6 +1,7 @@
 import { Bricolage_Grotesque, Figtree } from 'next/font/google';
 import type { Metadata, Viewport } from 'next';
 import type { CSSProperties, ReactNode } from 'react';
+import { PwaRegister } from '../components/pwa-register';
 import { SiteShell } from '../components/site-shell';
 import { auth } from '../server/identity/auth';
 import './globals.css';
@@ -23,6 +24,19 @@ export const metadata: Metadata = {
     template: '%s · Aotearoa Trails',
   },
   description: 'Discover New Zealand with an intelligent travel platform.',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: 'Aotearoa Trails',
+    statusBarStyle: 'default',
+  },
+  icons: {
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
+  },
 };
 
 export const viewport: Viewport = {
@@ -41,6 +55,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en-NZ" className={`${display.variable} ${body.variable}`}>
       <body style={fontVars}>
+        <PwaRegister />
         <SiteShell signedIn={Boolean(session?.user)}>{children}</SiteShell>
       </body>
     </html>
