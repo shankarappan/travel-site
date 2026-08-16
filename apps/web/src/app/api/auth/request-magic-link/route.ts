@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
   }
 
-  const token = issueMagicLinkToken(parsed.data.email);
+  const token = await issueMagicLinkToken(parsed.data.email);
   const verifyUrl = new URL('/api/auth/verify-magic-link', request.url);
   verifyUrl.searchParams.set('token', token);
 

@@ -16,7 +16,7 @@ export default async function TripsPage() {
     redirect('/sign-in');
   }
 
-  const trips = listTripsForUser(session.user.id);
+  const trips = await listTripsForUser(session.user.id);
 
   return (
     <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-8 sm:px-6 sm:py-12">

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
   }
   try {
-    const result = handleWhatsAppInbound(parsed.data);
+    const result = await handleWhatsAppInbound(parsed.data);
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(

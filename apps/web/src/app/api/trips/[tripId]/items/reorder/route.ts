@@ -18,7 +18,7 @@ export async function PUT(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Invalid reorder payload' }, { status: 400 });
   }
   try {
-    const trip = reorderItemsForUser(
+    const trip = await reorderItemsForUser(
       tripId,
       authResult.userId,
       parsed.data.dayId,

@@ -1,107 +1,57 @@
-export type ConversationChannel = 'web' | 'whatsapp' | 'telegram' | 'voice';
+import type { ConversationChannel, ConversationRecord } from '@travel/db';
+import { conversationRepository } from '../persistence/repos';
 
-export interface ChannelIdentity {
+export type { ConversationChannel };
+
+export async function createThread(input: {
   channel: ConversationChannel;
   externalId: string;
-  linkedUserId: string | null;
-  verified: boolean;
-}
-
-export interface ConversationThread {
-  id: string;
-  channel: ConversationChannel;
-  channelIdentity: ChannelIdentity;
-  messages: Array<{
-    id: string;
-    direction: 'inbound' | 'outbound';
-    body: string;
-    createdAt: string;
-  }>;
-  toolActions: Array<{
-    id: string;
-    toolName: string;
-    resultSummary: string;
-    createdAt: string;
-  }>;
-  createdAt: string;
-}
-
-const threads = new Map<string, ConversationThread>();
-const linkCodes = new Map<string, { userId: string; expiresAt: number }>();
-
-export function resetConversationHub(): void {
-  threads.clear();
-  linkCodes.clear();
-}
-
-export function createThread(input: {
-  channel: ConversationChannel;
-  externalId: string;
-}): ConversationThread {
-  const thread: ConversationThread = {
-    id: `thread_${crypto.randomUUID()}`,
+}): Promise<ConversationRecord> {
+  return conversationRepository().create({
     channel: input.channel,
-    channelIdentity: {
-      channel: input.channel,
-      externalId: input.externalId,
-      linkedUserId: null,
-      verified: false,
-    },
-    messages: [],
-    toolActions: [],
-    createdAt: new Date().toISOString(),
-  };
-  threads.set(thread.id, thread);
-  return thread;
+    externalId: input.externalId,
+  });
 }
 
-export function appendMessage(
+export async function appendMessage(
   threadId: string,
-  message: { direction: 'inbound' | 'outbound'; body: string },
-): ConversationThread {
-  const thread = threads.get(threadId);
-  if (!thread) throw new Error('Thread not found');
-  thread.messages.push({
-    id: crypto.randomUUID(),
+  message: { direction: 'inbound' | 'outbound'; body: string; role?: string },
+): Promise<ConversationRecord> {
+  return conversationRepository().appendMessage(threadId, {
+    role: message.role ?? message.direction,
     direction: message.direction,
     body: message.body,
-    createdAt: new Date().toISOString(),
   });
-  return thread;
 }
 
-export function issueAccountLinkCode(userId: string): string {
-  const code = Math.random().toString(36).slice(2, 8).toUpperCase();
-  linkCodes.set(code, { userId, expiresAt: Date.now() + 15 * 60 * 1000 });
-  return code;
+export async function issueAccountLinkCode(userId: string): Promise<string> {
+  return conversationRepository().issueAccountLinkCode(userId);
 }
 
-export function verifyAccountLink(threadId: string, code: string): ConversationThread {
-  const thread = threads.get(threadId);
-  if (!thread) throw new Error('Thread not found');
-  const record = linkCodes.get(code);
-  if (!record || record.expiresAt < Date.now()) {
-    throw new Error('Invalid or expired link code');
-  }
-  linkCodes.delete(code);
-  thread.channelIdentity = {
-    ...thread.channelIdentity,
-    linkedUserId: record.userId,
-    verified: true,
-  };
-  return thread;
+export async function verifyAccountLink(
+  threadId: string,
+  code: string,
+): Promise<ConversationRecord> {
+  return conversationRepository().verifyAccountLink(threadId, code);
 }
 
-export function assertPrivateDataAccess(thread: ConversationThread): void {
-  if (!thread.channelIdentity.verified || !thread.channelIdentity.linkedUserId) {
+export function assertPrivateDataAccess(thread: ConversationRecord): void {
+  if (!thread.verified || !thread.linkedUserId) {
     throw new Error('Channel identity is not linked; private booking data is blocked');
   }
 }
 
-export function listThreads(): ConversationThread[] {
-  return [...threads.values()];
+export async function listThreads(): Promise<ConversationRecord[]> {
+  return conversationRepository().list();
 }
 
-export function getThread(threadId: string): ConversationThread | undefined {
-  return threads.get(threadId);
+export async function getThread(threadId: string): Promise<ConversationRecord | undefined> {
+  return (await conversationRepository().get(threadId)) ?? undefined;
+}
+
+export async function findThreadByChannel(
+  channel: ConversationChannel,
+  externalId: string,
+): Promise<ConversationRecord | null> {
+  return conversationRepository().findByChannel(channel, externalId);
 }

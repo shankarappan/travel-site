@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid Telegram update' }, { status: 400 });
   }
-  const result = handleTelegramInbound({
+  const result = await handleTelegramInbound({
     chatId: String(parsed.data.message.chat.id),
     body: parsed.data.message.text,
   });

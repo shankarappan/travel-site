@@ -14,7 +14,9 @@
     "test": "turbo run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "env:check": "tsx scripts/check-env.ts"
+    "env:check": "tsx scripts/check-env.ts",
+    "db:migrate": "pnpm --filter @travel/db migrate",
+    "db:up": "docker compose up -d postgres"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

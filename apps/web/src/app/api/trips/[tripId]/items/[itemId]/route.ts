@@ -23,7 +23,7 @@ export async function DELETE(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'dayId query required' }, { status: 400 });
   }
   try {
-    const trip = deleteItemForUser(tripId, authResult.userId, parsed.data.dayId, itemId);
+    const trip = await deleteItemForUser(tripId, authResult.userId, parsed.data.dayId, itemId);
     return NextResponse.json({ trip: serializeTrip(trip) });
   } catch (error) {
     return tripErrorResponse(error);

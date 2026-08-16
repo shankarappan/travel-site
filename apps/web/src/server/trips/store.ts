@@ -1,55 +1,31 @@
-import {
-  addItineraryItem,
-  assertTripOwner,
-  createTrip,
-  deleteItineraryItem,
-  renameTrip,
-  reorderItineraryItems,
-  TripNotFoundError,
-  type ItineraryItemKind,
-  type Trip,
-} from '@travel/domain';
+import type { ItineraryItemKind, Trip } from '@travel/domain';
+import { tripRepository } from '../persistence/repos';
 
-const trips = new Map<string, Trip>();
-
-export function resetTripStore(): void {
-  trips.clear();
+export async function listTripsForUser(userId: string): Promise<Trip[]> {
+  return tripRepository().listForUser(userId);
 }
 
-export function listTripsForUser(userId: string): Trip[] {
-  return [...trips.values()]
-    .filter((trip) => trip.ownerId.value === userId)
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+export async function getTripForUser(tripId: string, userId: string): Promise<Trip> {
+  return tripRepository().getForUser(tripId, userId);
 }
 
-export function getTripForUser(tripId: string, userId: string): Trip {
-  const trip = trips.get(tripId);
-  if (!trip) {
-    throw new TripNotFoundError(tripId);
-  }
-  assertTripOwner(trip, userId);
-  return trip;
+export async function createTripForUser(userId: string, title: string): Promise<Trip> {
+  return tripRepository().create(userId, title);
 }
 
-export function createTripForUser(userId: string, title: string): Trip {
-  const trip = createTrip({ ownerId: userId, title });
-  trips.set(trip.id, trip);
-  return trip;
+export async function renameTripForUser(
+  tripId: string,
+  userId: string,
+  title: string,
+): Promise<Trip> {
+  return tripRepository().rename(tripId, userId, title);
 }
 
-export function renameTripForUser(tripId: string, userId: string, title: string): Trip {
-  const current = getTripForUser(tripId, userId);
-  const next = renameTrip(current, title);
-  trips.set(next.id, next);
-  return next;
+export async function deleteTripForUser(tripId: string, userId: string): Promise<void> {
+  return tripRepository().delete(tripId, userId);
 }
 
-export function deleteTripForUser(tripId: string, userId: string): void {
-  getTripForUser(tripId, userId);
-  trips.delete(tripId);
-}
-
-export function addItemForUser(
+export async function addItemForUser(
   tripId: string,
   userId: string,
   input: {
@@ -59,33 +35,24 @@ export function addItemForUser(
     notes?: string | null;
     refSlug?: string | null;
   },
-): Trip {
-  const current = getTripForUser(tripId, userId);
-  const next = addItineraryItem(current, input.dayId, input);
-  trips.set(next.id, next);
-  return next;
+): Promise<Trip> {
+  return tripRepository().addItem(tripId, userId, input);
 }
 
-export function reorderItemsForUser(
+export async function reorderItemsForUser(
   tripId: string,
   userId: string,
   dayId: string,
   orderedItemIds: readonly string[],
-): Trip {
-  const current = getTripForUser(tripId, userId);
-  const next = reorderItineraryItems(current, dayId, orderedItemIds);
-  trips.set(next.id, next);
-  return next;
+): Promise<Trip> {
+  return tripRepository().reorderItems(tripId, userId, dayId, orderedItemIds);
 }
 
-export function deleteItemForUser(
+export async function deleteItemForUser(
   tripId: string,
   userId: string,
   dayId: string,
   itemId: string,
-): Trip {
-  const current = getTripForUser(tripId, userId);
-  const next = deleteItineraryItem(current, dayId, itemId);
-  trips.set(next.id, next);
-  return next;
+): Promise<Trip> {
+  return tripRepository().deleteItem(tripId, userId, dayId, itemId);
 }

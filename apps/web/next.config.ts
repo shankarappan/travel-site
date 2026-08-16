@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     '@travel/observability',
     '@travel/ui',
     '@travel/consent',
+    '@travel/db',
   ],
   images: {
     remotePatterns: [

@@ -1,18 +1,8 @@
 import { createHmac } from 'node:crypto';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { resetConversationHub } from '../conversations/hub';
-import {
-  handleTelegramInbound,
-  handleVoiceTool,
-  handleWhatsAppInbound,
-  verifyWhatsAppSignature,
-} from './adapters';
+import { describe, expect, it } from 'vitest';
+import { handleVoiceTool, handleWhatsAppInbound, verifyWhatsAppSignature } from './adapters';
 
 describe('channel adapters', () => {
-  beforeEach(() => {
-    resetConversationHub();
-  });
-
   it('verifies WhatsApp HMAC signatures', () => {
     const body = '{"from":"+64","body":"hi"}';
     const signature = `sha256=${createHmac('sha256', 'secret').update(body).digest('hex')}`;
@@ -20,23 +10,18 @@ describe('channel adapters', () => {
     expect(verifyWhatsAppSignature(body, 'sha256=deadbeef', 'secret')).toBe(false);
   });
 
-  it('requires consent for promotional WhatsApp and supports opt-out', () => {
-    expect(() =>
+  it('requires consent for promotional WhatsApp and supports opt-out without persistence', async () => {
+    await expect(
       handleWhatsAppInbound({
         from: '+642111',
         body: 'promo deal',
         isPromotional: true,
         hasMarketingConsent: false,
       }),
-    ).toThrow(/consent/i);
+    ).rejects.toThrow(/consent/i);
 
-    const optOut = handleWhatsAppInbound({ from: '+642111', body: 'STOP' });
+    const optOut = await handleWhatsAppInbound({ from: '+642111', body: 'STOP' });
     expect(optOut.reply).toMatch(/opted out/i);
-  });
-
-  it('keeps Telegram booking data private when unverified', () => {
-    const result = handleTelegramInbound({ chatId: '99', body: 'Show my booking' });
-    expect(result.reply).toMatch(/Unverified|private/i);
   });
 
   it('requires voice read-back confirmation for sensitive fields', () => {

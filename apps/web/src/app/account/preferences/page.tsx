@@ -19,13 +19,13 @@ export default async function PreferencesPage() {
     redirect('/sign-in');
   }
 
-  ensureTransactionalConsent(session.user.id);
-  const statuses = getConsentStatuses(session.user.id);
+  await ensureTransactionalConsent(session.user.id);
+  const statuses = await getConsentStatuses(session.user.id);
   const initial = Object.fromEntries(
     statuses.map((status) => [status.purpose, status.granted]),
   ) as Partial<Record<ConsentPurpose, boolean>>;
 
-  const marketingToken = issueUnsubscribeToken(session.user.id, 'marketing_email');
+  const marketingToken = await issueUnsubscribeToken(session.user.id, 'marketing_email');
 
   return (
     <div className="mx-auto max-w-[var(--travel-shell-max)] px-4 py-10 sm:px-6 sm:py-14">

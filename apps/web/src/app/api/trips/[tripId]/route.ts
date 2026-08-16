@@ -14,7 +14,7 @@ export async function GET(_request: Request, context: RouteContext) {
   if ('response' in authResult) return authResult.response;
   const { tripId } = await context.params;
   try {
-    const trip = getTripForUser(tripId, authResult.userId);
+    const trip = await getTripForUser(tripId, authResult.userId);
     return NextResponse.json({ trip: serializeTrip(trip) });
   } catch (error) {
     return tripErrorResponse(error);
@@ -30,7 +30,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Valid title required' }, { status: 400 });
   }
   try {
-    const trip = renameTripForUser(tripId, authResult.userId, parsed.data.title);
+    const trip = await renameTripForUser(tripId, authResult.userId, parsed.data.title);
     return NextResponse.json({ trip: serializeTrip(trip) });
   } catch (error) {
     return tripErrorResponse(error);
@@ -42,7 +42,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
   if ('response' in authResult) return authResult.response;
   const { tripId } = await context.params;
   try {
-    deleteTripForUser(tripId, authResult.userId);
+    await deleteTripForUser(tripId, authResult.userId);
     return NextResponse.json({ ok: true });
   } catch (error) {
     return tripErrorResponse(error);

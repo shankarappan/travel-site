@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid webhook' }, { status: 400 });
   }
   try {
-    const result = handlePaymentWebhook({
+    const result = await handlePaymentWebhook({
       ...parsed.data,
       signature,
     });

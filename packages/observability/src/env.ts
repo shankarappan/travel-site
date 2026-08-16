@@ -5,6 +5,7 @@ export const envSchema = z.object({
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
   NEXT_PUBLIC_ADMIN_URL: z.string().url().default('http://localhost:3001'),
+  DATABASE_URL: z.string().min(1).optional(),
 });
 
 export type AppEnv = z.infer<typeof envSchema>;

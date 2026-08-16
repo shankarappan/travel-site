@@ -1,12 +1,14 @@
-import { consentLedger } from '@travel/consent';
+import { getPool, PostgresConsentRepository } from '@travel/db';
 import type { Metadata } from 'next';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Operations console',
 };
 
-export default function AdminHomePage() {
-  const ledgers = consentLedger.listAll();
+export default async function AdminHomePage() {
+  const ledgers = await new PostgresConsentRepository(getPool()).listAll();
 
   return (
     <main style={{ padding: '2rem', maxWidth: '64rem', display: 'grid', gap: '1.5rem' }}>
@@ -30,9 +32,9 @@ export default function AdminHomePage() {
       </section>
 
       <section>
-        <h2>Consent snapshot (this process)</h2>
+        <h2>Consent snapshot</h2>
         {ledgers.length === 0 ? (
-          <p>No consent events in this admin process yet.</p>
+          <p>No consent events recorded yet.</p>
         ) : (
           <ul>
             {ledgers.map((ledger) => (

@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
   }
-  const result = subscribeNewsletter({
+  const result = await subscribeNewsletter({
     userId: session.user.id,
     email: parsed.data.email,
     campaign: parsed.data.campaign,

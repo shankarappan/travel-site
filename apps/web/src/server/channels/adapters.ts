@@ -3,8 +3,8 @@ import {
   appendMessage,
   assertPrivateDataAccess,
   createThread,
+  findThreadByChannel,
   getThread,
-  listThreads,
 } from '../conversations/hub';
 
 export function verifyWhatsAppSignature(
@@ -20,12 +20,12 @@ export function verifyWhatsAppSignature(
   }
 }
 
-export function handleWhatsAppInbound(input: {
+export async function handleWhatsAppInbound(input: {
   from: string;
   body: string;
   isPromotional?: boolean;
   hasMarketingConsent?: boolean;
-}): { threadId: string; reply: string } {
+}): Promise<{ threadId: string; reply: string }> {
   if (input.isPromotional && !input.hasMarketingConsent) {
     throw new Error('Promotional WhatsApp messages require valid consent');
   }
@@ -33,49 +33,46 @@ export function handleWhatsAppInbound(input: {
     return { threadId: 'opt-out', reply: 'You are opted out of WhatsApp promotions.' };
   }
 
-  let thread = listThreads().find(
-    (item) => item.channel === 'whatsapp' && item.channelIdentity.externalId === input.from,
-  );
+  let thread = await findThreadByChannel('whatsapp', input.from);
   if (!thread) {
-    thread = createThread({ channel: 'whatsapp', externalId: input.from });
+    thread = await createThread({ channel: 'whatsapp', externalId: input.from });
   }
-  appendMessage(thread.id, { direction: 'inbound', body: input.body });
+  await appendMessage(thread.id, { direction: 'inbound', body: input.body });
 
   let reply =
     'Thanks for messaging Aotearoa Trails on WhatsApp. Link your account with a verification code before private booking access.';
   if (/booking|order/i.test(input.body)) {
     try {
-      assertPrivateDataAccess(thread);
+      const fresh = (await getThread(thread.id))!;
+      assertPrivateDataAccess(fresh);
       reply = 'Linked identity verified — booking summary tools can run.';
     } catch {
       reply = 'I can help generally, but private booking details require a verified account link.';
     }
   }
-  appendMessage(thread.id, { direction: 'outbound', body: reply });
+  await appendMessage(thread.id, { direction: 'outbound', body: reply });
   return { threadId: thread.id, reply };
 }
 
-export function handleTelegramInbound(input: { chatId: string; body: string }): {
-  threadId: string;
-  reply: string;
-} {
-  let thread = listThreads().find(
-    (item) => item.channel === 'telegram' && item.channelIdentity.externalId === input.chatId,
-  );
+export async function handleTelegramInbound(input: {
+  chatId: string;
+  body: string;
+}): Promise<{ threadId: string; reply: string }> {
+  let thread = await findThreadByChannel('telegram', input.chatId);
   if (!thread) {
-    thread = createThread({ channel: 'telegram', externalId: input.chatId });
+    thread = await createThread({ channel: 'telegram', externalId: input.chatId });
   }
-  appendMessage(thread.id, { direction: 'inbound', body: input.body });
+  await appendMessage(thread.id, { direction: 'inbound', body: input.body });
   let reply = 'Telegram connected. Private bookings stay hidden until account linking is verified.';
   if (/booking/i.test(input.body)) {
     try {
-      assertPrivateDataAccess(getThread(thread.id)!);
+      assertPrivateDataAccess((await getThread(thread.id))!);
       reply = 'Linked Telegram identity — booking tools allowed.';
     } catch {
       reply = 'Unverified Telegram identity cannot access private booking data.';
     }
   }
-  appendMessage(thread.id, { direction: 'outbound', body: reply });
+  await appendMessage(thread.id, { direction: 'outbound', body: reply });
   return { threadId: thread.id, reply };
 }
 

@@ -5,8 +5,10 @@ import {
   READ_ONLY_TOOL_NAMES,
   type ConciergeEvalFixture,
 } from '@travel/ai';
+import type { ConversationRecord as PersistedConversation } from '@travel/db';
 import { createLogger } from '@travel/observability';
 import { catalogRepository } from '../catalog/file-repository';
+import { conversationRepository } from '../persistence/repos';
 import { getTripForUser, listTripsForUser } from '../trips/store';
 
 const logger = createLogger({ service: 'concierge' });
@@ -27,11 +29,9 @@ export interface ConversationRecord {
   updatedAt: string;
 }
 
-const conversations = new Map<string, ConversationRecord>();
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
 
 export function resetConciergeStore(): void {
-  conversations.clear();
   rateBuckets.clear();
 }
 
@@ -46,6 +46,43 @@ function rateLimit(key: string, limit = 30, windowMs = 60_000): void {
     throw new Error('Rate limit exceeded');
   }
   bucket.count += 1;
+}
+
+function toUiConversation(record: PersistedConversation): ConversationRecord {
+  return {
+    id: record.id,
+    userId: record.userId,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+    messages: record.messages.map((message) => ({
+      id: message.id,
+      role: (message.role === 'assistant' || message.role === 'tool' ? message.role : 'user') as
+        'user' | 'assistant' | 'tool',
+      content: message.body,
+      toolName: message.toolName ?? undefined,
+      createdAt: message.createdAt,
+    })),
+  };
+}
+
+async function appendUiMessage(
+  conversationId: string,
+  message: {
+    role: 'user' | 'assistant' | 'tool';
+    content: string;
+    toolName?: string;
+    direction?: 'inbound' | 'outbound' | null;
+  },
+): Promise<ConversationRecord> {
+  const persisted = await conversationRepository().appendMessage(conversationId, {
+    role: message.role,
+    direction:
+      message.direction ??
+      (message.role === 'user' ? 'inbound' : message.role === 'assistant' ? 'outbound' : null),
+    body: message.content,
+    toolName: message.toolName ?? null,
+  });
+  return toUiConversation(persisted);
 }
 
 async function runTool(
@@ -143,22 +180,28 @@ export async function handleConciergeTurn(input: {
 }): Promise<{ conversation: ConversationRecord; reply: string }> {
   rateLimit(input.userId ?? 'anonymous');
   const prompt = getPrompt('concierge.system');
-  const now = new Date().toISOString();
-  const conversation =
-    (input.conversationId && conversations.get(input.conversationId)) ||
-    ({
-      id: crypto.randomUUID(),
-      userId: input.userId,
-      messages: [],
-      createdAt: now,
-      updatedAt: now,
-    } satisfies ConversationRecord);
+  const repo = conversationRepository();
 
-  conversation.messages.push({
-    id: crypto.randomUUID(),
+  let conversation: ConversationRecord;
+  if (input.conversationId) {
+    const existing = await repo.get(input.conversationId);
+    if (!existing) {
+      throw new Error('Conversation not found');
+    }
+    conversation = toUiConversation(existing);
+  } else {
+    const created = await repo.create({
+      userId: input.userId,
+      channel: 'web',
+      externalId: `web_${crypto.randomUUID()}`,
+    });
+    conversation = toUiConversation(created);
+  }
+
+  conversation = await appendUiMessage(conversation.id, {
     role: 'user',
     content: input.message,
-    createdAt: now,
+    direction: 'inbound',
   });
 
   let reply: string;
@@ -170,12 +213,11 @@ export async function handleConciergeTurn(input: {
     const toolCall = detectTool(input.message);
     if (toolCall) {
       const result = await runTool(toolCall.name, toolCall.args, input.userId);
-      conversation.messages.push({
-        id: crypto.randomUUID(),
+      conversation = await appendUiMessage(conversation.id, {
         role: 'tool',
         content: JSON.stringify(result),
         toolName: toolCall.name,
-        createdAt: new Date().toISOString(),
+        direction: null,
       });
       logger.info('concierge.tool_call', {
         tool: toolCall.name,
@@ -184,7 +226,7 @@ export async function handleConciergeTurn(input: {
       });
       reply = `Using ${toolCall.name} (prompt ${prompt?.version ?? 'n/a'}):\n${summarizeToolResult(toolCall.name, result)}`;
     } else if (input.userId) {
-      const trips = listTripsForUser(input.userId);
+      const trips = await listTripsForUser(input.userId);
       reply = `I can look up destinations, search curated guides, fetch your trips (${trips.length} saved), or suggest an editorial itinerary. Live inventory remains disconnected.`;
     } else {
       reply =
@@ -192,14 +234,11 @@ export async function handleConciergeTurn(input: {
     }
   }
 
-  conversation.messages.push({
-    id: crypto.randomUUID(),
+  conversation = await appendUiMessage(conversation.id, {
     role: 'assistant',
     content: reply,
-    createdAt: new Date().toISOString(),
+    direction: 'outbound',
   });
-  conversation.updatedAt = new Date().toISOString();
-  conversations.set(conversation.id, conversation);
   return { conversation, reply };
 }
 

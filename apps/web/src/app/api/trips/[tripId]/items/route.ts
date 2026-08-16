@@ -14,7 +14,7 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Invalid itinerary item' }, { status: 400 });
   }
   try {
-    const trip = addItemForUser(tripId, authResult.userId, parsed.data);
+    const trip = await addItemForUser(tripId, authResult.userId, parsed.data);
     return NextResponse.json({ trip: serializeTrip(trip) }, { status: 201 });
   } catch (error) {
     return tripErrorResponse(error);
