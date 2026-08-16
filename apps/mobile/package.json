@@ -1,0 +1,12 @@
+{
+  "name": "@travel/mobile",
+  "private": true,
+  "version": "0.0.0",
+  "description": "React Native/Expo foundation placeholder — enable after web APIs stabilize (Prompt 23).",
+  "scripts": {
+    "lint": "echo 'mobile scaffold: no lint yet'",
+    "typecheck": "echo 'mobile scaffold: no typecheck yet'",
+    "test": "echo 'mobile scaffold: no tests yet'",
+    "build": "echo 'mobile scaffold: deferred until Expo app bootstrap'"
+  }
+}

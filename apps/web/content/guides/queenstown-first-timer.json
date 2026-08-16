@@ -1,0 +1,21 @@
+{
+  "slug": "queenstown-first-timer",
+  "title": "Queenstown for first-timers",
+  "dek": "A calm two-day outline before adventure operators fill the calendar.",
+  "destinationSlug": "queenstown",
+  "hero": {
+    "src": "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=2000&q=80",
+    "alt": "Soft morning light on a New Zealand harbour shoreline promenade",
+    "source": "Unsplash",
+    "sourceUrl": "https://unsplash.com"
+  },
+  "body": [
+    "Day one: walk the lake edge early, then keep the afternoon free for a short trail with clear weather windows.",
+    "Day two: explore the town centre on foot and note stay neighbourhoods you may search later — without treating placeholder modules as live inventory."
+  ],
+  "seo": {
+    "title": "Queenstown first-timer guide",
+    "description": "A practical first visit outline for Queenstown that never invents prices or availability."
+  },
+  "updatedAt": "2026-08-16T00:00:00.000Z"
+}

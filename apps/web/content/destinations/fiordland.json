@@ -1,0 +1,36 @@
+{
+  "slug": "fiordland",
+  "name": "Fiordland",
+  "region": "Southland",
+  "summary": "Rainforest fiords, waterfall walls and Milford Sound approaches in Fiordland National Park.",
+  "hero": {
+    "src": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=2000&q=80",
+    "alt": "Steep green fiord cliffs rising from dark water in New Zealand",
+    "source": "Unsplash",
+    "sourceUrl": "https://unsplash.com"
+  },
+  "highlights": [
+    "Milford Sound viewpoints",
+    "Rainforest boardwalks",
+    "Waterfall-fed cliffs",
+    "Weather-aware day planning"
+  ],
+  "body": [
+    "Fiordland is defined by weather systems as much as scenery. Editorial guidance emphasises flexible timing; live cruise inventory is not claimed here.",
+    "Use the map hook for Te Anau / Milford corridor orientation. Accommodation near Te Anau will connect through the provider adapter later."
+  ],
+  "accommodationPlaceholder": "Te Anau and corridor stays will surface from sandbox search — not invented here.",
+  "activitiesPlaceholder": "Cruise and walk options remain placeholders until activity providers are verified.",
+  "map": {
+    "label": "Milford Sound visitor area",
+    "latitude": -44.6714,
+    "longitude": 167.9256,
+    "zoom": 10
+  },
+  "seo": {
+    "title": "Fiordland travel guide",
+    "description": "Orient to Fiordland fiords and Milford approaches with map hooks and honest inventory placeholders."
+  },
+  "relatedGuideSlugs": [],
+  "updatedAt": "2026-08-16T00:00:00.000Z"
+}

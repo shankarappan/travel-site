@@ -1,0 +1,21 @@
+{
+  "slug": "rotorua-geothermal-day",
+  "title": "A geothermal day in Rotorua",
+  "dek": "How to sequence parks and lake time without overcommitting the clock.",
+  "destinationSlug": "rotorua",
+  "hero": {
+    "src": "https://images.unsplash.com/photo-1589802829985-817e51171b92?auto=format&fit=crop&w=2000&q=80",
+    "alt": "Geothermal steam drifting through trees on mineral ground",
+    "source": "Unsplash",
+    "sourceUrl": "https://unsplash.com"
+  },
+  "body": [
+    "Begin with a geothermal park that publishes accessibility notes, then return to the lakefront when steam and sulphur feel like enough for the morning.",
+    "Keep evening cultural experiences optional until ticketing integrations are live — this guide stays editorial."
+  ],
+  "seo": {
+    "title": "Rotorua geothermal day guide",
+    "description": "Sequence Rotorua geothermal parks and lake time with clear, non-commercial guidance."
+  },
+  "updatedAt": "2026-08-16T00:00:00.000Z"
+}

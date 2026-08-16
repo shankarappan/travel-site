@@ -1,0 +1,36 @@
+{
+  "slug": "queenstown",
+  "name": "Queenstown",
+  "region": "Otago",
+  "summary": "Alpine adventure hub on the shores of Lake Wakatipu, built for trail days and lake light.",
+  "hero": {
+    "src": "https://images.unsplash.com/photo-1469521669194-babb45599def?auto=format&fit=crop&w=2000&q=80",
+    "alt": "Mist rising over green New Zealand mountains beside a still alpine lake",
+    "source": "Unsplash",
+    "sourceUrl": "https://unsplash.com/photos/green-mountain-across-body-of-water-I2YSpXMo6qI"
+  },
+  "highlights": [
+    "Lake Wakatipu shoreline walks",
+    "Remarkables trail access",
+    "Seasonal ski fields nearby",
+    "Compact town centre for evening meals"
+  ],
+  "body": [
+    "Queenstown remains the South Island’s best-known base for lake days, hiking approaches and winter sport. This guide stays editorial: live stay prices appear only after provider search is connected.",
+    "Use the map hook below for orientation, then save a trip once itinerary tools land. Accommodation and activity modules are placeholders until sandbox inventory is wired."
+  ],
+  "accommodationPlaceholder": "Stay results for Queenstown will load from the accommodation provider adapter (sandbox first).",
+  "activitiesPlaceholder": "Curated Queenstown activities will appear here without inventing availability or prices.",
+  "map": {
+    "label": "Queenstown town centre",
+    "latitude": -45.0312,
+    "longitude": 168.6626,
+    "zoom": 11
+  },
+  "seo": {
+    "title": "Queenstown travel guide",
+    "description": "Plan Queenstown with curated highlights, map orientation and honest placeholders for stays and activities."
+  },
+  "relatedGuideSlugs": ["queenstown-first-timer"],
+  "updatedAt": "2026-08-16T00:00:00.000Z"
+}
