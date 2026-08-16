@@ -29,4 +29,5 @@ Admin app: `pnpm --filter @travel/admin dev` (port 3001).
 | `@travel/providers` | Supplier adapter interfaces |
 | `@travel/ai` | Prompt registry and tool schemas |
 | `@travel/observability` | Env validation + structured logging |
+| `@travel/consent` | Append-only consent ledger + send policy helpers |
 | `@travel/ui` | Design tokens and accessible UI primitives |

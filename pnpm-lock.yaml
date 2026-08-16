@@ -41,6 +41,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@travel/consent':
+        specifier: workspace:*
+        version: link:../../packages/consent
       '@travel/domain':
         specifier: workspace:*
         version: link:../../packages/domain
@@ -81,6 +84,9 @@ importers:
       '@travel/api-contracts':
         specifier: workspace:*
         version: link:../../packages/api-contracts
+      '@travel/consent':
+        specifier: workspace:*
+        version: link:../../packages/consent
       '@travel/domain':
         specifier: workspace:*
         version: link:../../packages/domain
@@ -152,6 +158,22 @@ importers:
       zod:
         specifier: ^3.25.51
         version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.1
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@26.1.0)(lightningcss@1.32.0)(tsx@4.23.12)
+
+  packages/consent:
+    dependencies:
+      '@travel/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@travel/observability':
+        specifier: workspace:*
+        version: link:../observability
     devDependencies:
       typescript:
         specifier: ^5.8.3

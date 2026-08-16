@@ -15,3 +15,19 @@ export {
   normalizeEmail,
   resolveAccountForSignIn,
 } from './identity.js';
+
+export type {
+  ConsentChannel,
+  ConsentEvent,
+  ConsentPurpose,
+  ConsentSource,
+  ConsentStatus,
+} from './consent.js';
+export {
+  CURRENT_CONSENT_POLICY_VERSION,
+  MARKETING_PURPOSES,
+  canSendForPurpose,
+  createConsentEvent,
+  isMarketingPurpose,
+  materializeConsentStatuses,
+} from './consent.js';

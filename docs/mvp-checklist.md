@@ -14,7 +14,7 @@ Derived from the Technical Blueprint Definition of Done and Feature Prompt Libra
 
 - [x] Email/passwordless + Google + Apple auth with one internal user ID
 - [x] Session handling, logout, account linking, role model
-- [ ] Consent ledger (transactional vs marketing) + withdrawal UX
+- [x] Consent ledger (transactional vs marketing) + withdrawal UX
 
 ## Discovery & trips
 

@@ -56,6 +56,15 @@ export default async function AccountPage() {
         </Card>
       </div>
 
+      <p className="mt-6">
+        <a
+          href="/account/preferences"
+          className="text-sm font-semibold text-[var(--travel-color-fern)] underline-offset-2 hover:underline"
+        >
+          Communication preferences
+        </a>
+      </p>
+
       <form
         className="mt-8"
         action={async () => {
